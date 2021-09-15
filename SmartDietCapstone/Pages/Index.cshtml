@@ -40,7 +40,7 @@
                 <strong>Age</strong>
             </div>
             <div class="col-md-4">
-                <input type="number" min="1" max="115" class="form-control" />
+                <input type="number" min="1" max="115" name="age" class="form-control" />
             </div>
         </div>
 
@@ -49,7 +49,7 @@
                 <strong>Weight (lbs)</strong>
             </div>
             <div class="col-md-4">
-                <input type="number" min="1" max="1000" class="form-control" />
+                <input type="number" min="1" max="1000" name="weight" class="form-control" />
             </div>
         </div>
 
@@ -162,27 +162,16 @@
                 </select>
             </div>
         </div>
-        <div class="row justify-content-between">
-            <div class="col-md-4">
-                <strong>Which one of these describes your goals?</strong>
-            </div>
-            <div class="col-md-4">
-                <select name="goalSelect" id="goalSelect" class="form-control">
-                    <option value="1">Lose Weight</option>
-                    <option value="2" selected>Maintain Weight</option>
-                    <option value="3">Gain Weight</option>
-                </select>
-            </div>
-        </div>
+        
         <div class="row justify-content-between">
             <div class="col-md-4">
                 <strong>How Many Meals a Day?</strong>
             </div>
             <div class="col-md-4">
                 <select name="mealNumSelect" id="mealNumSelect" class="form-control">
-                    <option value="1" selected>1</option>
+                    <option value="1" >1</option>
                     <option value="2">2</option>
-                    <option value="3">3</option>
+                    <option value="3" selected>3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
                     <option value="6">6</option>
