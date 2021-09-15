@@ -24,6 +24,8 @@ namespace SmartDietCapstone
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            //services.AddHttpClient<>(client => client.BaseAddress = new Uri(Configuration.GetSection("FDCApi").Value);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

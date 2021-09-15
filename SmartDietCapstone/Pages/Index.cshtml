@@ -5,6 +5,209 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div class="row justify-content-end">
+        <div class="col">
+            <div class="col">
+                <a href="#" class="btn btn-primary btn-lg">Admin Login</a>
+            </div>
+        </div>
+        <div class="col">
+            <a href="#" class="btn btn-primary btn-lg">User Login</a>
+        </div>
+        
+    </div>
+    <h1 class="display-4">Smart Meals</h1>
+    
+    
+
+    <h3>Enter Your Info</h3>
+
+    <h4>Info About You:</h4>
+    <form method="post">
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>Gender</strong>
+            </div>
+            <div class="col-md-4">
+                <select name="genderSelect" id="genderSelect" class="form-control">
+                    <option value="male" selected>Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>Age</strong>
+            </div>
+            <div class="col-md-4">
+                <input type="number" min="1" max="115" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>Weight (lbs)</strong>
+            </div>
+            <div class="col-md-4">
+                <input type="number" min="1" max="1000" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>Height</strong>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col">
+                        <select name="feetSelect" id="feetSelect" class="form-control">
+                            <option value="1">1'</option>
+                            <option value="2">2'</option>
+                            <option value="3">3'</option>
+                            <option value="4">4'</option>
+                            <option value="5">5'</option>
+                            <option value="6">6'</option>
+                            <option value="7">7'</option>
+                            <option value="8">8'</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select name="inchSelect" id="inchSelect" class="form-control">
+                            <option value="1">1"</option>
+                            <option value="2">2"</option>
+                            <option value="3">3"</option>
+                            <option value="4">4"</option>
+                            <option value="5">5"</option>
+                            <option value="6">6"</option>
+                            <option value="7">7"</option>
+                            <option value="8">8"</option>
+                            <option value="8">9"</option>
+                            <option value="8">10"</option>
+                            <option value="8">11"</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>Activity Level</strong>
+            </div>
+            <div class="col-md-4">
+                <select name="activitySelect" id="activitySelect" class="form-control">
+                    <option value="0" selected>Sedentary</option>
+                    <option value="1">Light Exercise (1-2 times a week)</option>
+                    <option value="2">Moderate Exercise (3-5 times a week)</option>
+                    <option value="3">Active Exercise (Daily Exercise/Intense 3-4 times a week)</option>
+                    <option value="4">Very Active Exercise (Intense exercise 6-7 times a week)</option>
+                    <option value="5">Daily Exercise (Physical job/Two times a day)</option>
+                </select>
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>Goal</strong>
+            </div>
+            <div class="col-md-4">
+                <select name="goalSelect" id="goalSelect" class="form-control">
+                    <option value="0" selected>Weight Loss</option>
+                    <option value="1">Maintenance</option>
+                    <option value="2">Weight Gain</option>
+                </select>
+            </div>
+        </div>
+
+        <h4>Food Preferences:</h4>
+        <div class="row justify-content-between">
+            <div class="col-md-4 ">
+                <strong>Diet Type? (Check all that apply)</strong>
+            </div>
+            <div class="col-md-4 text-left">
+
+
+                @Html.CheckBox("isGlutenFree", false)
+                @Html.Label("isGlutenFree", "Gluten-Free")
+                <br />
+                @Html.CheckBox("isVegetarian", false)
+                @Html.Label("isVegetarian", "Vegetarian")
+                <br />
+                @Html.CheckBox("isVegan", false)
+                @Html.Label("isVegan", "Vegan")
+                <br />
+                @Html.CheckBox("isKeto", false)
+                @Html.Label("isKeto", "Keto")
+                <br />
+                @Html.CheckBox("isPescatarian", false)
+                @Html.Label("isPescatarian", "Pescatarian")
+                <br />
+                <!--<select name="dietSelect" id="dietSelect" class="form-control">
+            <option value="1" selected>Gluten-free</option>
+            <option value="2">Vegetarian</option>
+            <option value="3">Vegan</option>
+            <option value="4">Keto</option>
+            <option value="5">Pescatarian</option>-->
+                @*<option value="6">6</option>*@
+                <!--</select>-->
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>Please pick your carb intake</strong>
+            </div>
+            <div class="col-md-4">
+                <select name="carbNumSelect" id="carbNumSelect" class="form-control">
+                    <option value="1">Low</option>
+                    <option value="2" selected>Medium</option>
+                    <option value="3">High</option>
+                </select>
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>Which one of these describes your goals?</strong>
+            </div>
+            <div class="col-md-4">
+                <select name="goalSelect" id="goalSelect" class="form-control">
+                    <option value="1">Lose Weight</option>
+                    <option value="2" selected>Maintain Weight</option>
+                    <option value="3">Gain Weight</option>
+                </select>
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <strong>How Many Meals a Day?</strong>
+            </div>
+            <div class="col-md-4">
+                <select name="mealNumSelect" id="mealNumSelect" class="form-control">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+            </div>
+        </div>
+        
+        <input type="submit" class="btn btn-primary" />
+    </form>
 </div>
+
+@*@section Scripts{
+<script>
+    $(document).ready(function () {
+        $.get({
+            url: "https://api.nal.usda.gov/fdc/v1/foods/list?api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA?pageSize=200",
+            success: function (data) {
+                console.log(data);
+            },
+           
+            contentType: "application/json",
+            dataType: "json"
+
+        });
+    });
+</script>
+}*@
+            

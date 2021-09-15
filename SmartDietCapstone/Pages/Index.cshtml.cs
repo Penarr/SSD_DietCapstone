@@ -15,11 +15,17 @@ namespace SmartDietCapstone.Pages
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
+           
         }
 
-        public void OnGet()
+        public IActionResult OnPost()
         {
+            if (!ModelState.IsValid)
+            {
+                return new PageResult();
+            }
 
+            return new RedirectToPageResult("Diet","CreateDiet");
         }
     }
 }
