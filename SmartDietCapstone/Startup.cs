@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SmartDietCapstone
@@ -24,6 +25,7 @@ namespace SmartDietCapstone
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddSingleton<HttpClient>();
 
             //services.AddHttpClient<>(client => client.BaseAddress = new Uri(Configuration.GetSection("FDCApi").Value);
         }

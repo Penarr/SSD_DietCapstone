@@ -4,9 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace SmartDietCapstone
-{
+{/// <summary>
+/// FOUNDATION FOODS DOCUMENTATION https://fdc.nal.usda.gov/docs/Foundation_Foods_Documentation_Apr2021.pdf
+/// API DOCUMENTATION https://fdc.nal.usda.gov/api-spec/fdc_api.html
+/// </summary>
     public class FoodCalculator
     {
+
+        private int proteinNum = 203;
+        private int carbNum = 305;
+        private int fatNum = 204;
+        private int calNum = 208;
+        private string dataType = "Foundation";
+        
         /// <summary>
         /// Implements Benedict-Harris method of calculating calories based on physiology and activity levels.
         /// Assumes measurements are imperial, not metric
@@ -65,6 +75,13 @@ namespace SmartDietCapstone
            
         }
 
+
+       private object SearchFood(string query)
+        {
+            return new object();
+        }
+
+
        public double CalculateFat(double calories, int carbAmount)
         {
 
@@ -82,6 +99,28 @@ namespace SmartDietCapstone
         public double CalculateCarbs(double calories, int carbAmount)
         {
             return 0;
+        }
+
+
+        public string GenerateBreakfast()
+        {
+            return "";
+        }
+
+
+        public string GenerateLunch()
+        {
+            return "";
+        }
+
+
+        public string GenerateDinner() { return ""; }
+
+
+        public string GenerateSnack()
+        {
+            return "";
+
         }
     }
 }
