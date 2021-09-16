@@ -38,7 +38,7 @@ namespace SmartDietCapstone.Pages
         public async Task<IActionResult> OnPostAsync(string genderSelect, int age, double weight, int feetSelect, int inchSelect, int activitySelect, int goalSelect, bool isGlutenFree, bool isPescatarian, bool isVegetarian, bool isVegan, bool isKeto, int carbNumSelect, int mealNumSelect)
         {
 
-            FoodCalculator foodCalculator = new FoodCalculator();
+            FoodCalculator foodCalculator = new FoodCalculator(_client);
 
             // Convert imperial units to metric
             double centimetres = feetSelect * 30.48 + (inchSelect * 2.54);
@@ -51,29 +51,9 @@ namespace SmartDietCapstone.Pages
 
 
             // Testing api feature
-            //string data = "query=apple&datatype=Foundation&pageSize=2&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA";
-            var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/search?query=apple&datatype=foundation&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // search
-            //var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/list?datatype=Foundation&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // List
-            //response = await _client.PostAsync("https://api.nal.usda.gov/fdc/v1/foods/search", new StringContent(data));
 
 
-            //get id of protein, carb, fat, kcal and derivation description
 
-            var result = await response.Content.ReadAsStringAsync();
-
-            JObject obj;
-            JArray jarray;
-            try
-            {
-                 obj = JObject.Parse(result);
-                var x = obj["foods"][0]; // Search
-            }
-            catch
-            {
-                jarray = JArray.Parse(result); // List
-            }
-
-            
 
             if (!ModelState.IsValid)
             {

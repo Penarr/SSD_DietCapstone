@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SmartDietCapstone
@@ -15,8 +17,12 @@ namespace SmartDietCapstone
         private int carbNum = 305;
         private int fatNum = 204;
         private int calNum = 208;
-        private string dataType = "Foundation";
-        
+        private string dataType = "Foundation, SR Legacy";
+        private HttpClient _client;
+        public FoodCalculator(HttpClient client)
+        {
+            _client = client;
+        }
         /// <summary>
         /// Implements Benedict-Harris method of calculating calories based on physiology and activity levels.
         /// Assumes measurements are imperial, not metric
@@ -76,8 +82,29 @@ namespace SmartDietCapstone
         }
 
 
-       private object SearchFood(string query)
+       private async Task<object> SearchFood(string query)
         {
+            //string data = "query=apple&datatype=Foundation&pageSize=2&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA";
+            var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/search?query=apple&datatype=foundation&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // search
+            //var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/list?datatype=Foundation&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // List
+            //response = await _client.PostAsync("https://api.nal.usda.gov/fdc/v1/foods/search", new StringContent(data));
+
+
+            //get id of protein, carb, fat, kcal and derivation description
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            JObject obj;
+            JArray jarray;
+            try
+            {
+                obj = JObject.Parse(result);
+                var x = obj["foods"][0]; // Search
+            }
+            catch
+            {
+                jarray = JArray.Parse(result); // List
+            }
             return new object();
         }
 
