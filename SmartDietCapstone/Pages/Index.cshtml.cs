@@ -37,24 +37,17 @@ namespace SmartDietCapstone.Pages
 
         public async Task<IActionResult> OnPostAsync(string genderSelect, int age, double weight, int feetSelect, int inchSelect, int activitySelect, int goalSelect, bool isGlutenFree, bool isPescatarian, bool isVegetarian, bool isVegan, bool isKeto, int carbNumSelect, int mealNumSelect)
         {
-
-            FoodCalculator foodCalculator = new FoodCalculator(_client);
-
-            // Convert imperial units to metric
             double centimetres = feetSelect * 30.48 + (inchSelect * 2.54);
             double kilograms = weight / 2.20462;
 
-            //Add feet to inches
+
             double height = inchSelect + feetSelect * 12;
 
-            double calories = foodCalculator.CalculateCalories(genderSelect, age, weight, height, goalSelect, activitySelect);
 
 
-            // Testing api feature
+            FoodCalculator foodCalculator = new FoodCalculator(_client, genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect);
 
-
-
-
+            
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors);

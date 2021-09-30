@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+
 using System.Threading.Tasks;
 
 namespace SmartDietCapstone
@@ -13,15 +15,29 @@ namespace SmartDietCapstone
     public class FoodCalculator
     {
 
-        private int proteinNum = 203;
-        private int carbNum = 305;
-        private int fatNum = 204;
-        private int calNum = 208;
-        private string dataType = "Foundation, SR Legacy";
+        private int proteinApiNum = 203;
+        private int carbApiNum = 305;
+        private int fatApiNum = 204;
+        private int calApiNum = 208;
+        private string dataType = "Foundation,SR%20Legacy";
+
+        private double calorieCount;
+        private double fatCount;
+        private double proteinCount;
+        private double carbCount;
+
+
         private HttpClient _client;
-        public FoodCalculator(HttpClient client)
+        public FoodCalculator(HttpClient client, string gender, int age, double weight, double height, int goal, int activityLevel, bool isKeto, int carbAmount)
         {
             _client = client;
+            calorieCount = CalculateCalories( gender, age,  weight, height, goal, activityLevel);
+            fatCount = CalculateFat(calorieCount, carbAmount, isKeto);
+            proteinCount = CalculateProtein(calorieCount);
+            carbCount = CalculateCarbs(calorieCount, carbAmount, isKeto);
+
+            GenerateDiet(3);
+            //object o = SearchFood("meat");
         }
         /// <summary>
         /// Implements Benedict-Harris method of calculating calories based on physiology and activity levels.
@@ -36,7 +52,7 @@ namespace SmartDietCapstone
         /// <returns></returns>
         public double CalculateCalories(string gender, int age, double weight, double height, int goal, int activityLevel)
         {
-            double calories = 0;
+            double calories = 2000;
             if (gender == "Male")
                 calories = 66.47 + (6.24 * weight) + (12.7 * height) - (6.755 * age);
 
@@ -81,73 +97,122 @@ namespace SmartDietCapstone
            
         }
 
+       
 
        private async Task<object> SearchFood(string query)
         {
-            //string data = "query=apple&datatype=Foundation&pageSize=2&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA";
-            var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/search?query=apple&datatype=foundation&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // search
-            //var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/list?datatype=Foundation&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // List
-            //response = await _client.PostAsync("https://api.nal.usda.gov/fdc/v1/foods/search", new StringContent(data));
+            // string data = "query=apple&datatype=Foundation&pageSize=2&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA";
+            var response = await _client.GetAsync($"https://api.nal.usda.gov/fdc/v1/foods/search?query={query}&dataType=Foundation,SR%20Legacy&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // search
+            // var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/list?datatype=Foundation&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // List
+            // response = await _client.PostAsync("https://api.nal.usda.gov/fdc/v1/foods/search", new StringContent(data));
 
 
             //get id of protein, carb, fat, kcal and derivation description
-
+            Random rand = new Random();
             var result = await response.Content.ReadAsStringAsync();
 
             JObject obj;
             JArray jarray;
+            var x = new object();
+            JsonSerializer jsonSerializer = new JsonSerializer();
             try
             {
-                obj = JObject.Parse(result);
-                var x = obj["foods"][0]; // Search
+                obj = jsonSerializer.(result);
+                int randIndex = rand.Next(0, obj["foods"].Count());
+                x = obj["foods"][randIndex]; // Search
             }
             catch
             {
                 jarray = JArray.Parse(result); // List
             }
-            return new object();
+            return x;
         }
 
-
-       public double CalculateFat(double calories, int carbAmount)
+        
+       public double CalculateFat(double calories, int carbAmount, bool isKeto)
         {
+            int fatPercent = 35;
 
-            return 0;
+            if (isKeto)
+                fatPercent = 60;
+            else
+            {
+                switch (carbAmount)
+                {
+                    case 1:
+                        fatPercent = 45;
+                        break;
+                    case 2:
+                        fatPercent = 35;
+                        break;
+                    case 3:
+                        fatPercent = 25;
+                        break;
+
+                }
+            }
+            
+            // Amount of fat in grams
+            return calories * fatPercent / 9;
 
         }
 
 
-        public double CalculateProtein(double calories, int carbAmount)
+        public double CalculateProtein(double calories)
         {
-            return 0;
+            // Amount of protein in grams
+            return calories * 0.3 / 4;
+
         }
 
 
-        public double CalculateCarbs(double calories, int carbAmount)
+        public double CalculateCarbs(double calories, int carbAmount, bool isKeto)
         {
-            return 0;
+            int carbPercent = 55;
+
+            if (isKeto)
+                carbPercent = 60;
+            else
+            {
+                switch (carbAmount)
+                {
+                    case 1:
+                        carbPercent = 45;
+                        break;
+                    case 2:
+                        carbPercent = 55;
+                        break;
+                    case 3:
+                        carbPercent = 65;
+                        break;
+
+                }
+            }
+
+            // Amount of carbs in grams
+            return calories * carbPercent / 4;
         }
 
 
-        public string GenerateBreakfast()
+        public object[,] GenerateDiet(int mealNum)
         {
-            return "";
+            double caloriesPerMeal = calorieCount / mealNum;
+            string[] queries = { "Meat", "vegetable", "grain" };
+            object[,] mealPlan = new string[mealNum, 3];
+            for(int i = 0; i <= mealNum; i++)
+            {
+                for(int j = 0; j < 3; j++)
+                {
+                    mealPlan[i,j] = SearchFood(queries[j]);
+                }
+                
+            }
+
+            return mealPlan;
         }
+        
 
 
-        public string GenerateLunch()
-        {
-            return "";
-        }
-
-
-        public string GenerateDinner() { return ""; }
-
-
-        public string GenerateSnack()
-        {
-            return "";
-
-        }
+       
     }
 }
