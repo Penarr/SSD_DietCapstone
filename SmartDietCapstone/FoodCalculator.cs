@@ -14,13 +14,13 @@ namespace SmartDietCapstone
 /// </summary>
     public class FoodCalculator
     {
-
-        private int proteinApiNum = 203;
-        private int carbApiNum = 305;
-        private int fatApiNum = 204;
-        private int calApiNum = 208;
-        private string dataType = "Foundation,SR%20Legacy";
-
+        // Nutrient number values in FDC api
+        private const int proteinApiNum = 203;
+        private const int carbApiNum = 205;
+        private const int fatApiNum = 204;
+        private const int calApiNum = 208;
+        private const string dataType = "Foundation,SR%20Legacy";
+        // Ideal amount in grams of each meal
         private double calorieCount;
         private double fatCount;
         private double proteinCount;
@@ -31,12 +31,12 @@ namespace SmartDietCapstone
         public FoodCalculator(HttpClient client, string gender, int age, double weight, double height, int goal, int activityLevel, bool isKeto, int carbAmount)
         {
             _client = client;
-            calorieCount = CalculateCalories( gender, age,  weight, height, goal, activityLevel);
+            calorieCount = CalculateCalories(gender, age, weight, height, goal, activityLevel);
             fatCount = CalculateFat(calorieCount, carbAmount, isKeto);
             proteinCount = CalculateProtein(calorieCount);
             carbCount = CalculateCarbs(calorieCount, carbAmount, isKeto);
 
-            GenerateDiet(3);
+
             //object o = SearchFood("meat");
         }
         /// <summary>
@@ -53,14 +53,15 @@ namespace SmartDietCapstone
         public double CalculateCalories(string gender, int age, double weight, double height, int goal, int activityLevel)
         {
             double calories = 2000;
-            if (gender == "Male")
+            if (gender == "male")
                 calories = 66.47 + (6.24 * weight) + (12.7 * height) - (6.755 * age);
 
 
-            else if (gender == "Female")
+            else if (gender == "female")
                 calories = 655.1 + (4.35 * weight) + (4.7 * height) - (4.7 * age);
 
-            switch (activityLevel) {
+            switch (activityLevel)
+            {
                 case 0:
                     calories *= 1.2;
                     break;
@@ -82,7 +83,8 @@ namespace SmartDietCapstone
                     break;
             }
 
-            switch (goal) {
+            switch (goal)
+            {
                 case 0:
                     calories -= 500;
                     break;
@@ -92,17 +94,28 @@ namespace SmartDietCapstone
                     break;
             }
 
-            return calories;
+            return 2000;
 
-           
+
         }
 
-       
 
-       private async Task<object> SearchFood(string query)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="j"></param>
+        /// <param name="caloriesRemaining"></param>
+        /// <param name="proteinRemaing"></param>
+        /// <param name="fatRemaining"></param>
+        /// <param name="carbsRemaining"></param>
+        /// <param name="mealNum"></param>
+        /// <returns></returns>
+        private async Task<Food> SearchFood(string query, int j, double caloriesRemaining, double proteinRemaing, double fatRemaining, double carbsRemaining, int mealNum)
         {
+            // ,SR%20Legacy
             // string data = "query=apple&datatype=Foundation&pageSize=2&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA";
-            var response = await _client.GetAsync($"https://api.nal.usda.gov/fdc/v1/foods/search?query={query}&dataType=Foundation,SR%20Legacy&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // search
+            var response = await _client.GetAsync($"https://api.nal.usda.gov/fdc/v1/foods/search?query={query}&dataType=Foundation&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // search
             // var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/list?datatype=Foundation&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // List
             // response = await _client.PostAsync("https://api.nal.usda.gov/fdc/v1/foods/search", new StringContent(data));
 
@@ -111,47 +124,139 @@ namespace SmartDietCapstone
             Random rand = new Random();
             var result = await response.Content.ReadAsStringAsync();
 
+            // JObject that will store information in an array from api
             JObject obj;
-            JArray jarray;
-            var x = new object();
-            JsonSerializer jsonSerializer = new JsonSerializer();
+
+            Food food = new Food();
+
             try
             {
-                obj = jsonSerializer.(result);
-                int randIndex = rand.Next(0, obj["foods"].Count());
-                x = obj["foods"][randIndex]; // Search
+                bool validFoodChoice = false;
+                // Try food again
+                while (!validFoodChoice)
+                {
+                    obj = JObject.Parse(result);
+                    int randIndex = rand.Next(0, obj["foods"].Count());
+
+                    food.name = obj["foods"][randIndex]["description"].ToString();
+                    var foodNutrients = obj["foods"][randIndex]["foodNutrients"];
+                    double calsPerGram = 0;
+                    double proteinPerGram = 0;
+                    double fatPerGram = 0;
+                    double carbsPerGram = 0;
+                    // Iterate through  nutrient value, assign value per gram to variable
+                    for (int i = 0; i < foodNutrients.Count(); i++)
+                    {
+                        int nutrientNumber = (int)foodNutrients[i]["nutrientNumber"];
+                        switch (nutrientNumber)
+                        {
+                            case calApiNum:
+                                calsPerGram = (double)foodNutrients[i]["value"] / 100;
+                                break;
+
+                            case proteinApiNum:
+                                proteinPerGram = (double)foodNutrients[i]["value"] / 100;
+                                break;
+                            case carbApiNum:
+                                carbsPerGram = (double)foodNutrients[i]["value"] / 100;
+                                break;
+                            case fatApiNum:
+                                fatPerGram = (double)foodNutrients[i]["value"] / 100;
+                                break;
+                        }
+                        if (fatPerGram != 0 && proteinPerGram != 0 && carbsPerGram != 0 && calsPerGram != 0)
+                            break;
+                    }
+
+                    // This section will decide serving size of food
+                    double calsPerMeal = calorieCount / mealNum;
+                    double proteinPerMeal = proteinCount / mealNum;
+                    double fatPerMeal = fatCount / mealNum;
+                    double carbsPerMeal = carbCount / mealNum;
+                    // Calculate serving size of food in meal
+
+
+                    // Protein
+                    if (j == 0)
+                    {
+                        double servingSize = (proteinPerMeal - proteinPerMeal * 0.1) / proteinPerGram;
+                        double caloriesOfFood = calsPerGram * servingSize;
+                        food.servingSize = servingSize;
+                        food.carbs = carbsPerGram * servingSize;
+                        food.protein = proteinPerGram * servingSize;
+                        food.fat = fatPerGram * servingSize;
+                        food.cals = calsPerGram * servingSize;
+                        if (!(food.carbs >= food.protein)! && !(food.fat >= food.protein))
+                            validFoodChoice = true;
+                    }
+                    // Carb food
+                    else if (j == 1)
+                    {
+                        double servingSize = (carbsRemaining - carbsPerMeal * 0.1) / carbsPerGram;
+                        double caloriesOfFood = calsPerGram * servingSize;
+                        food.servingSize = servingSize;
+                        food.carbs = carbsPerGram * servingSize;
+                        food.protein = proteinPerGram * servingSize;
+                        food.fat = fatPerGram * servingSize;
+                        food.cals = calsPerGram * servingSize;
+                        if (!(food.protein >= food.carbs))
+                            validFoodChoice = true;
+                    }
+                    // Fill with vegetable
+                    else if (j == 2)
+                    {
+                        if (caloriesRemaining > 0)
+                        {
+                            double servingSize = calsPerMeal / calsPerGram;
+                            food.servingSize = servingSize;
+                            food.carbs = carbsPerGram * servingSize;
+                            food.protein = proteinPerGram * servingSize;
+                            food.fat = fatPerGram * servingSize;
+                            food.cals = calsPerGram * servingSize;
+                            validFoodChoice = true;
+                        }
+                    }
+                }
+
             }
-            catch
+            catch (Exception e)
             {
-                jarray = JArray.Parse(result); // List
+                var error = e.Message;
+
             }
-            return x;
+            return food;
         }
 
-        
-       public double CalculateFat(double calories, int carbAmount, bool isKeto)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="calories"></param>
+        /// <param name="carbAmount"></param>
+        /// <param name="isKeto"></param>
+        /// <returns></returns>
+        public double CalculateFat(double calories, int carbAmount, bool isKeto)
         {
-            int fatPercent = 35;
+            double fatPercent = 0.35;
 
             if (isKeto)
-                fatPercent = 60;
+                fatPercent = 0.60;
             else
             {
                 switch (carbAmount)
                 {
                     case 1:
-                        fatPercent = 45;
+                        fatPercent = 0.45;
                         break;
                     case 2:
-                        fatPercent = 35;
+                        fatPercent = 0.35;
                         break;
                     case 3:
-                        fatPercent = 25;
+                        fatPercent = 0.25;
                         break;
 
                 }
             }
-            
+
             // Amount of fat in grams
             return calories * fatPercent / 9;
 
@@ -165,25 +270,31 @@ namespace SmartDietCapstone
 
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="calories"></param>
+        /// <param name="carbAmount"></param>
+        /// <param name="isKeto"></param>
+        /// <returns></returns>
         public double CalculateCarbs(double calories, int carbAmount, bool isKeto)
         {
-            int carbPercent = 55;
+            double carbPercent = 0.55;
 
             if (isKeto)
-                carbPercent = 60;
+                carbPercent = 0.60;
             else
             {
                 switch (carbAmount)
                 {
                     case 1:
-                        carbPercent = 45;
+                        carbPercent = 0.45;
                         break;
                     case 2:
-                        carbPercent = 55;
+                        carbPercent = 0.55;
                         break;
                     case 3:
-                        carbPercent = 65;
+                        carbPercent = 0.65;
                         break;
 
                 }
@@ -193,26 +304,47 @@ namespace SmartDietCapstone
             return calories * carbPercent / 4;
         }
 
-
-        public object[,] GenerateDiet(int mealNum)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mealNum"></param>
+        /// <returns></returns>
+        public async Task<Food[,]> GenerateDiet(int mealNum)
         {
-            double caloriesPerMeal = calorieCount / mealNum;
-            string[] queries = { "Meat", "vegetable", "grain" };
-            object[,] mealPlan = new string[mealNum, 3];
-            for(int i = 0; i <= mealNum; i++)
+
+            string[] queries = { "Meat chicken turkey fish", "bread rice potato fruit", "vegetable fruit" };
+            Food[,] mealPlan = new Food[mealNum, 3];
+            for (int i = 0; i < mealNum; i++)
             {
-                for(int j = 0; j < 3; j++)
+                // Calories for each meal
+                double calsRemaining = calorieCount / mealNum;
+                double proteinRemaining = proteinCount / mealNum;
+                double carbsRemaining = carbCount / mealNum;
+                double fatRemaining = fatCount / mealNum;
+
+                //Individual food generation per meal
+                for (int j = 0; j < 3; j++)
                 {
-                    mealPlan[i,j] = SearchFood(queries[j]);
+                    // Only grab a new food if remaining calories is greater than 5% of the total calorie count
+                    if(calsRemaining > calorieCount / mealNum * 0.05)
+                    {
+                        mealPlan[i, j] = await SearchFood(queries[j], j, calsRemaining, proteinRemaining, fatRemaining, carbsRemaining, mealNum);
+                        // Calculate remaining macros for meal
+                        calsRemaining -= mealPlan[i, j].cals;
+                        proteinRemaining -= mealPlan[i, j].protein;
+                        carbsRemaining -= mealPlan[i, j].carbs;
+                        fatRemaining -= mealPlan[i, j].fat;
+                    }
+                    
                 }
-                
+
             }
 
             return mealPlan;
         }
-        
 
 
-       
+
+
     }
 }

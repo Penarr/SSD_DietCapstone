@@ -7,21 +7,21 @@ namespace SmartDietCapstone
 {
     public class Food
     {
-
-        public Food(int servingSize, int calsperServing, int proteinPerServing, int carbsPerServing, int fatPerServing)
+        public Food() { }
+        public Food(double servingSize, double cals, double protein, double fat, double carbs)
         {
             this.servingSize = servingSize;
-            this.calsPerServing = calsPerServing;
-            this.proteinPerServing = proteinPerServing;
-            this.carbsPerServing = carbsPerServing;
-            this.fatPerServing = fatPerServing;
+            this.cals = cals;
+            this.protein = protein;
+            this.carbs = carbs;
+            this.fat = fat;
         }
 
-        public int servingSize { get; set; }
-
-        public int calsPerServing { get; set; }
-        public int proteinPerServing { get; set; }
-        public int carbsPerServing { get; set; }
-        public int fatPerServing { get; set; }
+        public double servingSize { get; set; }
+        public string name { get; set; }
+        public double cals { get; set; }
+        public double protein { get; set; }
+        public double carbs { get; set; }
+        public double fat { get; set; }
     }
 }

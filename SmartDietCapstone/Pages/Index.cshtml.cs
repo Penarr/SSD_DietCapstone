@@ -47,7 +47,7 @@ namespace SmartDietCapstone.Pages
 
             FoodCalculator foodCalculator = new FoodCalculator(_client, genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect);
 
-            
+            var diet = await foodCalculator.GenerateDiet(3);
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
