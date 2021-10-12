@@ -14,7 +14,19 @@ namespace SmartDietCapstone
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
-            
+
+
+            //var contfiguration = host.Services.GetService()
+            //var hosting = host.Services.GetService<IWebHostEnvironment>();
+
+            //if (hosting.IsDevelopment())
+            //{
+            //    var secrets = configuration.GetSection("Secrets").Get<AppSecrets>();
+            //    DbInitializer.appSecrets = secrets;
+            //}
+
+           
+
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -22,6 +34,14 @@ namespace SmartDietCapstone
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                }).ConfigureAppConfiguration((hostContext, builder) =>
+                {
+                    // Add other providers for JSON, etc.
+
+                    if (hostContext.HostingEnvironment.IsDevelopment())
+                    {
+                        builder.AddUserSecrets<Program>();
+                    }
                 });
 
 

@@ -14,6 +14,7 @@ namespace SmartDietCapstone
 {
     public class Startup
     {
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -26,8 +27,9 @@ namespace SmartDietCapstone
         {
             services.AddRazorPages();
             services.AddSingleton<HttpClient>();
-
-            //services.AddHttpClient<>(client => client.BaseAddress = new Uri(Configuration.GetSection("FDCApi").Value);
+            //apiKey = Configuration["FDCApiKey"];
+            //apiUrl = Configuration[""]
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

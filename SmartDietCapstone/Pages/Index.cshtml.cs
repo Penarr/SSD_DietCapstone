@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
@@ -27,12 +28,13 @@ namespace SmartDietCapstone.Pages
 
         private readonly ILogger<IndexModel> _logger;
         private readonly HttpClient _client;
-
+        private IConfiguration _configuration;
         
-        public IndexModel(ILogger<IndexModel> logger, HttpClient client)
+        public IndexModel(ILogger<IndexModel> logger, HttpClient client, IConfiguration configuration)
         {
             _logger = logger;
             _client = client;
+            _configuration = configuration;
         }
 
         public async Task<IActionResult> OnPostAsync(string genderSelect, int age, double weight, int feetSelect, int inchSelect, int activitySelect, int goalSelect, bool isGlutenFree, bool isPescatarian, bool isVegetarian, bool isVegan, bool isKeto, int carbNumSelect, int mealNumSelect)
@@ -40,12 +42,14 @@ namespace SmartDietCapstone.Pages
             double centimetres = feetSelect * 30.48 + (inchSelect * 2.54);
             double kilograms = weight / 2.20462;
 
-
+            string apiKey = _configuration["Secrets:FDCApiKey"];
+            string apiUrl = _configuration["Secrets:FDCApi"];
             double height = inchSelect + feetSelect * 12;
 
 
 
-            FoodCalculator foodCalculator = new FoodCalculator(_client, genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect);
+            FoodCalculator foodCalculator = new FoodCalculator(_client, genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect, apiUrl, apiKey);
+                
 
             var diet = await foodCalculator.GenerateDiet(3);
             if (!ModelState.IsValid)

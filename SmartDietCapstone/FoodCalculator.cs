@@ -19,6 +19,10 @@ namespace SmartDietCapstone
         private const int carbApiNum = 205;
         private const int fatApiNum = 204;
         private const int calApiNum = 208;
+        private string apiKey;
+        private string apiUrl;
+
+        
         private const string dataType = "Foundation,SR%20Legacy";
         // Ideal amount in grams of each meal
         private double calorieCount;
@@ -28,15 +32,16 @@ namespace SmartDietCapstone
 
 
         private HttpClient _client;
-        public FoodCalculator(HttpClient client, string gender, int age, double weight, double height, int goal, int activityLevel, bool isKeto, int carbAmount)
+        public FoodCalculator(HttpClient client, string gender, int age, double weight, double height, int goal, int activityLevel, bool isKeto, int carbAmount, string apiUrl, string apiKey)
         {
             _client = client;
+            
             calorieCount = CalculateCalories(gender, age, weight, height, goal, activityLevel);
             fatCount = CalculateFat(calorieCount, carbAmount, isKeto);
             proteinCount = CalculateProtein(calorieCount);
             carbCount = CalculateCarbs(calorieCount, carbAmount, isKeto);
-
-
+            this.apiKey = apiKey;
+            this.apiUrl = apiUrl;
             //object o = SearchFood("meat");
         }
         /// <summary>
@@ -113,11 +118,9 @@ namespace SmartDietCapstone
         /// <returns></returns>
         private async Task<Food> SearchFood(string query, int j, double caloriesRemaining, double proteinRemaing, double fatRemaining, double carbsRemaining, int mealNum)
         {
-            // ,SR%20Legacy
-            // string data = "query=apple&datatype=Foundation&pageSize=2&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA";
-            var response = await _client.GetAsync($"https://api.nal.usda.gov/fdc/v1/foods/search?query={query}&dataType=Foundation&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // search
-            // var response = await _client.GetAsync("https://api.nal.usda.gov/fdc/v1/foods/list?datatype=Foundation&pageSize=25&api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA"); // List
-            // response = await _client.PostAsync("https://api.nal.usda.gov/fdc/v1/foods/search", new StringContent(data));
+          
+            var response = await _client.GetAsync($"{apiUrl}search?query={query}&dataType=Foundation&pageSize=25&api_key={apiKey}"); // search
+          
 
 
             //get id of protein, carb, fat, kcal and derivation description
@@ -179,21 +182,28 @@ namespace SmartDietCapstone
                     // Protein
                     if (j == 0)
                     {
-                        double servingSize = (proteinPerMeal - proteinPerMeal * 0.1) / proteinPerGram;
+                        double servingSize = (proteinPerMeal - proteinPerMeal * 0.05) / proteinPerGram;
+
+
                         double caloriesOfFood = calsPerGram * servingSize;
+                        
+                            
                         food.servingSize = servingSize;
                         food.carbs = carbsPerGram * servingSize;
                         food.protein = proteinPerGram * servingSize;
                         food.fat = fatPerGram * servingSize;
                         food.cals = calsPerGram * servingSize;
-                        if (!(food.carbs >= food.protein)! && !(food.fat >= food.protein))
+                        if (!(food.carbs >= food.protein)! && !(food.fat >= food.protein) || food.cals <= calsPerMeal + calsPerMeal * 0.1)
                             validFoodChoice = true;
                     }
                     // Carb food
                     else if (j == 1)
                     {
+
                         double servingSize = (carbsRemaining - carbsPerMeal * 0.1) / carbsPerGram;
                         double caloriesOfFood = calsPerGram * servingSize;
+                        if (caloriesOfFood > caloriesRemaining + caloriesRemaining * 0.05)
+                            servingSize = caloriesRemaining * 0.7 / calsPerGram;
                         food.servingSize = servingSize;
                         food.carbs = carbsPerGram * servingSize;
                         food.protein = proteinPerGram * servingSize;
@@ -205,9 +215,9 @@ namespace SmartDietCapstone
                     // Fill with vegetable
                     else if (j == 2)
                     {
-                        if (caloriesRemaining > 0)
+                        if (caloriesRemaining > calsPerMeal * 0.1)
                         {
-                            double servingSize = calsPerMeal / calsPerGram;
+                            double servingSize = caloriesRemaining / calsPerGram;
                             food.servingSize = servingSize;
                             food.carbs = carbsPerGram * servingSize;
                             food.protein = proteinPerGram * servingSize;
@@ -312,7 +322,7 @@ namespace SmartDietCapstone
         public async Task<Food[,]> GenerateDiet(int mealNum)
         {
 
-            string[] queries = { "Meat chicken turkey fish", "bread rice potato fruit", "vegetable fruit" };
+            string[] queries = { "Meat chicken turkey fish", "bread rice potato", "vegetable fruit" };
             Food[,] mealPlan = new Food[mealNum, 3];
             for (int i = 0; i < mealNum; i++)
             {
@@ -340,6 +350,23 @@ namespace SmartDietCapstone
 
             }
 
+            double totalCalories = 0;
+            double totalProtein = 0;
+            double totalCarbs = 0;
+            double totalFat = 0;
+
+            for(int i = 0; i < mealPlan.GetLength(0); i++)
+            {
+                for (int j = 0; j < mealPlan.GetLength(1); j++)
+                    if (mealPlan[i, j] != null)
+                    {
+                        totalCalories += mealPlan[i, j].cals;
+                        totalProtein += mealPlan[i, j].protein;
+                        totalCarbs += mealPlan[i, j].carbs;
+                        totalFat += mealPlan[i, j].fat;
+                    }
+                        
+            }
             return mealPlan;
         }
 
