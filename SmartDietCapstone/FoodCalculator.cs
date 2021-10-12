@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SmartDietCapstone.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -319,11 +320,11 @@ namespace SmartDietCapstone
         /// </summary>
         /// <param name="mealNum"></param>
         /// <returns></returns>
-        public async Task<List<List<Food>>> GenerateDiet(int mealNum)
+        public async Task<List<Meal>> GenerateDiet(int mealNum)
         {
 
             string[] queries = { "Meat chicken turkey fish", "bread rice potato", "vegetable fruit" };
-            List<List<Food>> mealPlan = new List<List<Food>>();
+            List<Meal> mealPlan = new List<Meal>();
             for (int i = 0; i < mealNum; i++)
             {
                 // Calories for each meal
@@ -332,23 +333,24 @@ namespace SmartDietCapstone
                 double carbsRemaining = carbCount / mealNum;
                 double fatRemaining = fatCount / mealNum;
 
+                Meal meal = new Meal();
                 //Individual food generation per meal
                 for (int j = 0; j < 3; j++)
                 {
-                    List<Food> meal = new List<Food>();
+                    
                     // Only grab a new food if remaining calories is greater than 5% of the total calorie count
                     if(calsRemaining > calorieCount / mealNum * 0.05)
                     {
-                        meal.Add(await SearchFood(queries[j], j, calsRemaining, proteinRemaining, fatRemaining, carbsRemaining, mealNum));
+                        meal.AddFood(await SearchFood(queries[j], j, calsRemaining, proteinRemaining, fatRemaining, carbsRemaining, mealNum));
                         // Calculate remaining macros for meal
-                        calsRemaining -= meal[j].cals;
-                        proteinRemaining -= meal[j].protein;
-                        carbsRemaining -= meal[j].carbs;
-                        fatRemaining -= meal[j].fat;
+                        calsRemaining -= meal.totalCals;
+                        proteinRemaining -= meal.totalProtein;
+                        carbsRemaining -= meal.totalCarbs;
+                        fatRemaining -= meal.totalFat;
                     }
                     
                 }
-
+                mealPlan.Add(meal);
             }
 
             double totalCalories = 0;
@@ -356,9 +358,9 @@ namespace SmartDietCapstone
             double totalCarbs = 0;
             double totalFat = 0;
 
-            foreach(List<Food> meal in mealPlan)
+            foreach(Meal meal in mealPlan)
             {
-               foreach(Food food in meal)
+               foreach(Food food in meal.foods)
                 {
                     totalCalories += food.cals;
                     totalProtein += food.protein;
