@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -37,7 +39,7 @@ namespace SmartDietCapstone.Pages
             _configuration = configuration;
         }
 
-        public async Task<IActionResult> OnPostAsync(string genderSelect, int age, double weight, int feetSelect, int inchSelect, int activitySelect, int goalSelect, bool isGlutenFree, bool isPescatarian, bool isVegetarian, bool isVegan, bool isKeto, int carbNumSelect, int mealNumSelect)
+        public async Task<IActionResult> OnPostAsync(string genderSelect, int age, double weight, int feetSelect, int inchSelect, int activitySelect, int goalSelect, bool isKeto, int carbNumSelect, int mealNumSelect)
         {
             double centimetres = feetSelect * 30.48 + (inchSelect * 2.54);
             double kilograms = weight / 2.20462;
@@ -46,12 +48,10 @@ namespace SmartDietCapstone.Pages
             string apiUrl = _configuration["Secrets:FDCApi"];
             double height = inchSelect + feetSelect * 12;
 
-
-
-            FoodCalculator foodCalculator = new FoodCalculator(_client, genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect, apiUrl, apiKey);
-                
-
-            var diet = await foodCalculator.GenerateDiet(3);
+            
+            
+          
+            
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
@@ -59,9 +59,21 @@ namespace SmartDietCapstone.Pages
                
                 return new PageResult();
             }
+            else
+            {
+                FoodCalculator foodCalculator = new FoodCalculator(_client, genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect, apiUrl, apiKey);
 
+
+                
+              
+                
+                var diet = await foodCalculator.GenerateDiet(mealNumSelect);
+                var jsonDiet = JsonConvert.SerializeObject(diet);
+                TempData["diet"] = jsonDiet;
+                return new RedirectToPageResult("Diet");
+            }
            
-            return new RedirectToPageResult("Diet");
+            
 
             
 

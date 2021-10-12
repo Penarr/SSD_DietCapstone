@@ -36,10 +36,10 @@ namespace SmartDietCapstone
         {
             _client = client;
             
-            calorieCount = CalculateCalories(gender, age, weight, height, goal, activityLevel);
-            fatCount = CalculateFat(calorieCount, carbAmount, isKeto);
-            proteinCount = CalculateProtein(calorieCount);
-            carbCount = CalculateCarbs(calorieCount, carbAmount, isKeto);
+            calorieCount = Math.Round(CalculateCalories(gender, age, weight, height, goal, activityLevel));
+            fatCount = Math.Round(CalculateFat(calorieCount, carbAmount, isKeto));
+            proteinCount = Math.Round(CalculateProtein(calorieCount));
+            carbCount = Math.Round(CalculateCarbs(calorieCount, carbAmount, isKeto));
             this.apiKey = apiKey;
             this.apiUrl = apiUrl;
             //object o = SearchFood("meat");
@@ -99,7 +99,7 @@ namespace SmartDietCapstone
                     break;
             }
 
-            return 2000;
+            return calories;
 
 
         }
@@ -188,11 +188,11 @@ namespace SmartDietCapstone
                         double caloriesOfFood = calsPerGram * servingSize;
                         
                             
-                        food.servingSize = servingSize;
-                        food.carbs = carbsPerGram * servingSize;
-                        food.protein = proteinPerGram * servingSize;
-                        food.fat = fatPerGram * servingSize;
-                        food.cals = calsPerGram * servingSize;
+                        food.servingSize = Math.Round(servingSize);
+                        food.carbs = Math.Round(carbsPerGram * servingSize);
+                        food.protein = Math.Round(proteinPerGram * servingSize);
+                        food.fat = Math.Round(fatPerGram * servingSize);
+                        food.cals = Math.Round(calsPerGram * servingSize);
                         if (!(food.carbs >= food.protein)! && !(food.fat >= food.protein) || food.cals <= calsPerMeal + calsPerMeal * 0.1)
                             validFoodChoice = true;
                     }
@@ -204,11 +204,11 @@ namespace SmartDietCapstone
                         double caloriesOfFood = calsPerGram * servingSize;
                         if (caloriesOfFood > caloriesRemaining + caloriesRemaining * 0.05)
                             servingSize = caloriesRemaining * 0.7 / calsPerGram;
-                        food.servingSize = servingSize;
-                        food.carbs = carbsPerGram * servingSize;
-                        food.protein = proteinPerGram * servingSize;
-                        food.fat = fatPerGram * servingSize;
-                        food.cals = calsPerGram * servingSize;
+                        food.servingSize = Math.Round(servingSize);
+                        food.carbs = Math.Round(carbsPerGram * servingSize);
+                        food.protein = Math.Round(proteinPerGram * servingSize);
+                        food.fat = Math.Round(fatPerGram * servingSize);
+                        food.cals = Math.Round(calsPerGram * servingSize);
                         if (!(food.protein >= food.carbs))
                             validFoodChoice = true;
                     }
@@ -218,10 +218,10 @@ namespace SmartDietCapstone
                         if (caloriesRemaining > calsPerMeal * 0.1)
                         {
                             double servingSize = caloriesRemaining / calsPerGram;
-                            food.servingSize = servingSize;
-                            food.carbs = carbsPerGram * servingSize;
-                            food.protein = proteinPerGram * servingSize;
-                            food.fat = fatPerGram * servingSize;
+                            food.servingSize = Math.Round(servingSize);
+                            food.carbs = Math.Round(carbsPerGram * servingSize);
+                            food.protein = Math.Round(proteinPerGram * servingSize);
+                            food.fat = Math.Round(fatPerGram * servingSize);
                             food.cals = calsPerGram * servingSize;
                             validFoodChoice = true;
                         }
@@ -319,11 +319,11 @@ namespace SmartDietCapstone
         /// </summary>
         /// <param name="mealNum"></param>
         /// <returns></returns>
-        public async Task<Food[,]> GenerateDiet(int mealNum)
+        public async Task<List<List<Food>>> GenerateDiet(int mealNum)
         {
 
             string[] queries = { "Meat chicken turkey fish", "bread rice potato", "vegetable fruit" };
-            Food[,] mealPlan = new Food[mealNum, 3];
+            List<List<Food>> mealPlan = new List<List<Food>>();
             for (int i = 0; i < mealNum; i++)
             {
                 // Calories for each meal
@@ -335,15 +335,16 @@ namespace SmartDietCapstone
                 //Individual food generation per meal
                 for (int j = 0; j < 3; j++)
                 {
+                    List<Food> meal = new List<Food>();
                     // Only grab a new food if remaining calories is greater than 5% of the total calorie count
                     if(calsRemaining > calorieCount / mealNum * 0.05)
                     {
-                        mealPlan[i, j] = await SearchFood(queries[j], j, calsRemaining, proteinRemaining, fatRemaining, carbsRemaining, mealNum);
+                        meal.Add(await SearchFood(queries[j], j, calsRemaining, proteinRemaining, fatRemaining, carbsRemaining, mealNum));
                         // Calculate remaining macros for meal
-                        calsRemaining -= mealPlan[i, j].cals;
-                        proteinRemaining -= mealPlan[i, j].protein;
-                        carbsRemaining -= mealPlan[i, j].carbs;
-                        fatRemaining -= mealPlan[i, j].fat;
+                        calsRemaining -= meal[j].cals;
+                        proteinRemaining -= meal[j].protein;
+                        carbsRemaining -= meal[j].carbs;
+                        fatRemaining -= meal[j].fat;
                     }
                     
                 }
@@ -355,17 +356,15 @@ namespace SmartDietCapstone
             double totalCarbs = 0;
             double totalFat = 0;
 
-            for(int i = 0; i < mealPlan.GetLength(0); i++)
+            foreach(List<Food> meal in mealPlan)
             {
-                for (int j = 0; j < mealPlan.GetLength(1); j++)
-                    if (mealPlan[i, j] != null)
-                    {
-                        totalCalories += mealPlan[i, j].cals;
-                        totalProtein += mealPlan[i, j].protein;
-                        totalCarbs += mealPlan[i, j].carbs;
-                        totalFat += mealPlan[i, j].fat;
-                    }
-                        
+               foreach(Food food in meal)
+                {
+                    totalCalories += food.cals;
+                    totalProtein += food.protein;
+                    totalCarbs += food.carbs;
+                    totalFat += food.fat;
+                }        
             }
             return mealPlan;
         }

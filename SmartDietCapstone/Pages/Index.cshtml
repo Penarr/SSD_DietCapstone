@@ -30,7 +30,7 @@
             </div>
             <div class="col-md-4">
                 @Html.TextBoxFor(m=>m.age, new { @value="", @class = "form-control", max = "115", type = "number" })
-                <p>@Html.ValidationMessageFor(m=>m.age)</p>
+                <p class="text-danger">@Html.ValidationMessageFor(m=>m.age)</p>
                 
                 @*<input type="number" min="1" max="115" name="age" class="form-control" />*@
             </div>
@@ -41,7 +41,8 @@
                 <strong>Weight (lbs)</strong>
             </div>
             <div class="col-md-4">
-                <input type="number" min="1" max="1000" name="weight" class="form-control" />
+                @Html.TextBoxFor(m => m.weight, new { @value = "", @class = "form-control", max = "800", type = "number", min = "60"})
+                <p class="text-danger">@Html.ValidationMessageFor(m => m.weight)</p>
             </div>
         </div>
 
@@ -110,7 +111,7 @@
         </div>
 
         <h4>Food Preferences:</h4>
-        <div class="row justify-content-between">
+        <!--<div class="row justify-content-between">
             <div class="col-md-4 ">
                 <strong>Diet Type? (Check all that apply)</strong>
             </div>
@@ -138,10 +139,10 @@
             <option value="3">Vegan</option>
             <option value="4">Keto</option>
             <option value="5">Pescatarian</option>-->
-                @*<option value="6">6</option>*@
+                <!--@*<option value="6">6</option>*@-->
                 <!--</select>-->
-            </div>
-        </div>
+            <!--</div>
+        </div>-->
         <div class="row justify-content-between">
             <div class="col-md-4">
                 <strong>Please pick your carb intake</strong>
@@ -176,19 +177,6 @@
 </div>
 
 @*@section Scripts{
-<script>
-    $(document).ready(function () {
-        $.get({
-            url: "https://api.nal.usda.gov/fdc/v1/foods/list?api_key=LFvEHThAZuPapYjKemtarLfGUylkrh1SnDwCdmCA?pageSize=200",
-            success: function (data) {
-                console.log(data);
-            },
-           
-            contentType: "application/json",
-            dataType: "json"
 
-        });
-    });
-</script>
 }*@
             

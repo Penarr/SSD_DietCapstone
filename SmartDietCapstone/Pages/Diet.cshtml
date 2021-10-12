@@ -1,7 +1,22 @@
 ﻿@page
 @model SmartDietCapstone.Pages.DietModel
-@{
-    <h1>Diet</h1>
 
 
-}
+<h1>Diet</h1>
+<div class="container-fluid">
+@foreach(List<Food> meal in Model.diet)
+            {
+                @foreach(Food food in meal) {
+                <div class="row justify-content-around">
+
+
+                </div>
+                
+                }
+                
+            }
+
+</div>
+
+
+
