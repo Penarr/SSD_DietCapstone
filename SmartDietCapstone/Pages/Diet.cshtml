@@ -3,11 +3,11 @@
 @using Models
 
 <h1>Diet</h1>
-<div class="container-fluid text-center">
+<div class="text-center">
     <h3>User Details</h3>
     <row class="justify-content-around">
         <div class="col-md-6">
-            <p><strong>Recommended Daily Calorie Intake:</strong></p>
+            <p><strong>Recommended Daily Caloric Intake:</strong></p>
         </div>
         <div class="col-md-2">
             <p>@Model.foodCalculator.calorieCount calories</p>
@@ -43,9 +43,9 @@
             </div>
 
             <div class="row justify-content-around">
-                <div class="col-sm">Save</div>
-                <div class="col-sm">Edit</div>
-                <div class="col-sm">Delete</div>
+                <div class="col-sm"><a href="#" class="btn btn-success">Save</a></div>
+                <div class="col-sm"><a href="#" class="btn btn-info">Edit</a></div>
+                <div class="col-sm"><a href="#" class="btn btn-danger">Delete</a></div>
             </div>
         }
 

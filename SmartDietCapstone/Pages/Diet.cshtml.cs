@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft;
 using Newtonsoft.Json;
 using SmartDietCapstone.Models;
+using Microsoft.AspNetCore.Session;
+using Microsoft.AspNetCore.Http;
 
 namespace SmartDietCapstone.Pages
 {
@@ -21,6 +23,8 @@ namespace SmartDietCapstone.Pages
         {
             _client = client;
             
+            
+
         }
         public void OnGet()
         {
@@ -28,17 +32,18 @@ namespace SmartDietCapstone.Pages
             var _calculator = "";
             if (HttpContext.Session.Keys.Contains("diet"))
             {
-                _diet = TempData["diet"] as string;
+                _diet = HttpContext.Session.GetString("diet");
             }
-            if (HttpContext.Session.Keys.Contains("calculator")) {
-                _calculator = TempData["calculator"] as string;
+            if (HttpContext.Session.Keys.Contains("calculator"))
+            {
+                _calculator = HttpContext.Session.GetString("calculator");
             }
             this.diet = JsonConvert.DeserializeObject<List<Meal>>(_diet);
             this.foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(_calculator);
             dietCalories = 0;
-            foreach(Meal meal in diet)
+            foreach (Meal meal in diet)
             {
-                foreach(Food food in meal.foods)
+                foreach (Food food in meal.foods)
                 {
                     dietCalories += food.cals;
                 }
