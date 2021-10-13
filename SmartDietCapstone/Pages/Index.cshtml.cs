@@ -11,6 +11,9 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Session;
+using Microsoft.AspNetCore.Http;
+
 
 
 namespace SmartDietCapstone.Pages
@@ -50,7 +53,7 @@ namespace SmartDietCapstone.Pages
 
             
             
-          
+         
             
             if (!ModelState.IsValid)
             {
@@ -69,7 +72,13 @@ namespace SmartDietCapstone.Pages
                 
                 var diet = await foodCalculator.GenerateDiet(mealNumSelect);
                 var jsonDiet = JsonConvert.SerializeObject(diet);
-                TempData["diet"] = jsonDiet;
+                var jsonCalculator = JsonConvert.SerializeObject(foodCalculator);
+                HttpContext.Session.SetString("diet", jsonDiet);
+                HttpContext.Session.SetString("calculator", jsonCalculator);
+
+
+                
+              
                 return new RedirectToPageResult("Diet");
             }
            

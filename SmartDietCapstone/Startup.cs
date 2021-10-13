@@ -27,9 +27,17 @@ namespace SmartDietCapstone
         {
             services.AddRazorPages();
             services.AddSingleton<HttpClient>();
-            //apiKey = Configuration["FDCApiKey"];
-            //apiUrl = Configuration[""]
+
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,10 +61,13 @@ namespace SmartDietCapstone
 
             app.UseAuthorization();
 
+            app.UseSession();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
             });
+
+            
         }
     }
 }

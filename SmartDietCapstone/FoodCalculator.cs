@@ -26,10 +26,10 @@ namespace SmartDietCapstone
         
         private const string dataType = "Foundation,SR%20Legacy";
         // Ideal amount in grams of each meal
-        private double calorieCount;
-        private double fatCount;
-        private double proteinCount;
-        private double carbCount;
+        public double calorieCount;
+        public double fatCount;
+        public double proteinCount;
+        public double carbCount;
 
 
         private HttpClient _client;

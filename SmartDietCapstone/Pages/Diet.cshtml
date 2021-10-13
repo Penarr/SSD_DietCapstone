@@ -1,20 +1,53 @@
 ﻿@page
 @model SmartDietCapstone.Pages.DietModel
-
+@using Models
 
 <h1>Diet</h1>
-<div class="container-fluid">
-@foreach(List<Food> meal in Model.diet)
-            {
-                @foreach(Food food in meal) {
-                <div class="row justify-content-around">
+<div class="container-fluid text-center">
+    <h3>User Details</h3>
+    <row class="justify-content-around">
+        <div class="col-md-6">
+            <p><strong>Recommended Daily Calorie Intake:</strong></p>
+        </div>
+        <div class="col-md-2">
+            <p>@Model.foodCalculator.calorieCount calories</p>
+        </div>
 
+        <div class="row justify-content-around">
+            <div class="col-md-6">
+                <p><strong>Total Calories of Generated Meal Plan:</strong></p>
+            </div>
+            <div class="col-md-2">
+                @Model.dietCalories calories
+            </div>
+        </div>
 
-                </div>
-                
+        <h3>Meal Recommendations</h3>
+        @foreach (Meal meal in Model.diet)
+        {
+            <div class="row justify-content-around">
+                @foreach (Food food in meal.foods)
+                {
+                    <div class="col-md-6">
+                        <h5>@food.name</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <p>@food.servingSize grams</p>
+                    </div>
                 }
-                
-            }
+            </div>
+
+            <div class="row justify-content-around">
+                <div class="col-md">Calories</div>
+                <div class="col-md">@meal.totalCals</div>
+            </div>
+
+            <div class="row justify-content-around">
+                <div class="col-sm">Save</div>
+                <div class="col-sm">Edit</div>
+                <div class="col-sm">Delete</div>
+            </div>
+        }
 
 </div>
 

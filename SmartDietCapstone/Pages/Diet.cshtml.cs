@@ -7,36 +7,42 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft;
 using Newtonsoft.Json;
+using SmartDietCapstone.Models;
 
 namespace SmartDietCapstone.Pages
 {
     public class DietModel : PageModel
     {
         private HttpClient _client;
-        public List<List<Food>> diet;
+        public List<Meal> diet;
+        public FoodCalculator foodCalculator;
+        public double dietCalories;
         public DietModel(HttpClient client)
         {
             _client = client;
             
-           
-            
-
         }
         public void OnGet()
         {
             var _diet = "";
-            if (TempData.ContainsKey("diet"))
+            var _calculator = "";
+            if (HttpContext.Session.Keys.Contains("diet"))
             {
                 _diet = TempData["diet"] as string;
             }
-
-            this.diet = JsonConvert.DeserializeObject<List<List<Food>>>(_diet);
-           
-        }
-
-        public void GenerateDiet()
-        {
-            
+            if (HttpContext.Session.Keys.Contains("calculator")) {
+                _calculator = TempData["calculator"] as string;
+            }
+            this.diet = JsonConvert.DeserializeObject<List<Meal>>(_diet);
+            this.foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(_calculator);
+            dietCalories = 0;
+            foreach(Meal meal in diet)
+            {
+                foreach(Food food in meal.foods)
+                {
+                    dietCalories += food.cals;
+                }
+            }
         }
 
        
