@@ -1,0 +1,223 @@
+﻿@page
+@model SmartDietCapstone.Pages.EditMealModel
+@{
+    @if (Model.meal == null)
+    {
+        <p class="text-danger">Please reenter valid information</p>
+    }
+    <h1 class="text-center">
+        Edit Meal
+    </h1>
+
+    <div class="row">
+        <div class="col-4">
+            <h2>Meal</h2>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>Serving size</th>
+                        <th>
+                            Calories
+                        </th>
+
+                        <th>
+                            Protein
+                        </th>
+                        <th>
+                            Carbs
+                        </th>
+                        <th>
+                            Fat
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="currentMealBody">
+
+
+                    @for (int i = 0; i < Model.meal.foods.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.meal.foods[i].name</td>
+                            <td>@Model.meal.foods[i].servingSize grams</td>
+                            <td>@Model.meal.foods[i].cals calories</td>
+                            <td>@Model.meal.foods[i].protein grams</td>
+                            <td>@Model.meal.foods[i].carbs grams</td>
+                            <td>@Model.meal.foods[i].fat grams</td>
+                            <td><button type="button" class="btn btn-info editFoodButton" value="@Json.Serialize(Model.meal.foods[i])">Edit</button></td>
+                            <td><button type="button" class="btn btn-primary deleteFoodButton" value="@i">Delete</button></td>
+                        </tr>
+
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        <div class="col-8">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#foodModal">
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="foodModal" tabindex="-1" role="dialog" aria-labelledby="foodModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="foodModalTitle">Edit Food</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <table id="editFoodTable">
+                                <thead>
+
+                                </thead>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <th>Serving size</th>
+                                        <th>
+                                            Calories
+                                        </th>
+
+                                        <th>
+                                            Protein
+                                        </th>
+                                        <th>
+                                            Carbs
+                                        </th>
+                                        <th>
+                                            Fat
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="editFoodBody">
+                                </tbody>
+
+                            </table>
+                            <p><strong>Data shown is per 100g</strong></p>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" id="searchBar" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" id="searchButton" class="btn btn-success">Search</button>
+                                </div>
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <th>
+                                            Calories
+                                        </th>
+                                        <th>
+                                            Protein
+                                        </th>
+                                        <th>
+                                            Carbs
+                                        </th>
+                                        <th>
+                                            Fat
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="searchBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+
+}
+@section Scripts{
+    <script>
+        $("#searchButton").click(function () {
+            let query = $("#searchBar").val();
+
+            $.ajax({
+                url: "/EditMeal?handler=FoodSearch",
+                data: {
+                    query: query
+                },
+                headers: {
+                    RequestVerificationToken:
+                        $('input:hidden[name="__RequestVerificationToken"]').val()
+                }
+            }).done(function (data) {
+
+                var foodHtml = "";
+                for (i = 0; i < data.length; i++) {
+                    food = data[i];
+                    foodRow = "<tr> <td>" + food.name + "</td> <td>" + food.cals + "</td> <td>" +
+                        food.protein + "</td> <td>" + food.carbs + "</td> <td>" + food.fat + "</td> </tr>"
+                    foodHtml += foodRow;
+                }
+                $("#searchBody").html(foodHtml);
+            }).fail(function (error) { console.log(error); });
+
+        });
+
+        // Prepares html table that allows user to edit food items
+        $(".editFoodButton").click(function () {
+            let food = JSON.parse($(this).val());
+            let editFoodHtml = "<tr> <td>" + food.name + "</td> <td>" + food.servingSize + "</td> <td>" + food.cals + "</td> <td>" +
+                food.protein + "</td> <td>" + food.carbs + "</td> <td>" + food.fat + "</td> </tr>";
+            $("#editFoodBody").html(editFoodHtml);
+
+        });
+
+        // Delete food from meal, then repopulates table
+        $(".deleteFoodButton").click(function () {
+            deleteIndex = $(this).val();
+            $.ajax({
+                url: "/EditMeal?handler=DeleteFood",
+                data: {
+                    index: deleteIndex
+                },
+                headers: {
+                    RequestVerificationToken:
+                        $('input:hidden[name="__RequestVerificationToken"]').val()
+                }
+            }).done(repopulateCurrentMeal);
+            }).fail(function (error) { console.log(error); });
+
+
+
+
+        function repopulateCurrentMeal() {
+            let replacedHtml =
+            @for(int i = 0; i < Model.meal.foods.Count; i++)
+                {
+                <text><tr>
+                        <td>@Model.meal.foods[i].name</td>
+                        <td>@Model.meal.foods[i].servingSize grams</td>
+                        <td>@Model.meal.foods[i].cals calories</td>
+                        <td>@Model.meal.foods[i].protein grams</td>
+                        <td>@Model.meal.foods[i].carbs grams</td>
+                    <td>@Model.meal.foods[i].fat grams</td>
+                    <td><button type="button" class="btn btn-info editFoodButton" value="@Json.Serialize(Model.meal.foods[i])">Edit</button></td>
+                        <td><button type="button" class="btn btn-primary deleteFoodButton" value="@i" >Delete</button></td>
+                </tr> </text>
+
+                }
+            $("#currentMealBody").html(replacedHtml);
+    </script>
+}

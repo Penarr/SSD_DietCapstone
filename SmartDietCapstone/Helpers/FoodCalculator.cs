@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SmartDietCapstone.Helpers;
 using SmartDietCapstone.Models;
 using System;
 using System.Collections.Generic;
@@ -20,9 +21,9 @@ namespace SmartDietCapstone
         private const int carbApiNum = 205;
         private const int fatApiNum = 204;
         private const int calApiNum = 208;
-        private string apiKey;
-        private string apiUrl;
+   
 
+        private APICaller caller;
         
         private const string dataType = "Foundation,SR%20Legacy";
         // Ideal amount in grams of each meal
@@ -32,18 +33,15 @@ namespace SmartDietCapstone
         public double carbCount;
 
 
-        private HttpClient _client;
-        public FoodCalculator(HttpClient client, string gender, int age, double weight, double height, int goal, int activityLevel, bool isKeto, int carbAmount, string apiUrl, string apiKey)
+        
+        public FoodCalculator(string gender, int age, double weight, double height, int goal, int activityLevel, bool isKeto, int carbAmount, APICaller apiCaller)
         {
-            _client = client;
             
             calorieCount = Math.Round(CalculateCalories(gender, age, weight, height, goal, activityLevel));
             fatCount = Math.Round(CalculateFat(calorieCount, carbAmount, isKeto));
             proteinCount = Math.Round(CalculateProtein(calorieCount));
             carbCount = Math.Round(CalculateCarbs(calorieCount, carbAmount, isKeto));
-            this.apiKey = apiKey;
-            this.apiUrl = apiUrl;
-            //object o = SearchFood("meat");
+            caller = apiCaller;
         }
         /// <summary>
         /// Implements Benedict-Harris method of calculating calories based on physiology and activity levels.
@@ -117,22 +115,19 @@ namespace SmartDietCapstone
         /// <param name="carbsRemaining"></param>
         /// <param name="mealNum"></param>
         /// <returns></returns>
-        private async Task<Food> SearchFood(string query, int j, double caloriesRemaining, double proteinRemaing, double fatRemaining, double carbsRemaining, int mealNum)
+        private async Task<Food> CalculateFood(string query, int j, double caloriesRemaining, double proteinRemaing, double fatRemaining, double carbsRemaining, int mealNum)
         {
-          
-            var response = await _client.GetAsync($"{apiUrl}search?query={query}&dataType=Foundation&pageSize=25&api_key={apiKey}"); // search
-          
 
-
+            
             //get id of protein, carb, fat, kcal and derivation description
             Random rand = new Random();
-            var result = await response.Content.ReadAsStringAsync();
+            var result = await caller.SearchFood(query);
 
             // JObject that will store information in an array from api
             JObject obj;
 
             Food food = new Food();
-
+            
             try
             {
                 bool validFoodChoice = false;
@@ -141,7 +136,8 @@ namespace SmartDietCapstone
                 {
                     obj = JObject.Parse(result);
                     int randIndex = rand.Next(0, obj["foods"].Count());
-
+                    
+                    food.fdcId = (int)obj["foods"][randIndex]["fdcId"];
                     food.name = obj["foods"][randIndex]["description"].ToString();
                     var foodNutrients = obj["foods"][randIndex]["foodNutrients"];
                     double calsPerGram = 0;
@@ -151,27 +147,35 @@ namespace SmartDietCapstone
                     // Iterate through  nutrient value, assign value per gram to variable
                     for (int i = 0; i < foodNutrients.Count(); i++)
                     {
-                        int nutrientNumber = (int)foodNutrients[i]["nutrientNumber"];
-                        switch (nutrientNumber)
+                        try
                         {
-                            case calApiNum:
-                                calsPerGram = (double)foodNutrients[i]["value"] / 100;
-                                break;
+                            double nutrientNumber = (double)foodNutrients[i]["nutrientNumber"];
+                            switch (nutrientNumber)
+                            {
+                                case calApiNum:
+                                    calsPerGram = (double)foodNutrients[i]["value"] / 100;
+                                    break;
 
-                            case proteinApiNum:
-                                proteinPerGram = (double)foodNutrients[i]["value"] / 100;
-                                break;
-                            case carbApiNum:
-                                carbsPerGram = (double)foodNutrients[i]["value"] / 100;
-                                break;
-                            case fatApiNum:
-                                fatPerGram = (double)foodNutrients[i]["value"] / 100;
+                                case proteinApiNum:
+                                    proteinPerGram = (double)foodNutrients[i]["value"] / 100;
+                                    break;
+                                case carbApiNum:
+                                    carbsPerGram = (double)foodNutrients[i]["value"] / 100;
+                                    break;
+                                case fatApiNum:
+                                    fatPerGram = (double)foodNutrients[i]["value"] / 100;
+                                    break;
+                            }
+                            if (fatPerGram != 0 && proteinPerGram != 0 && carbsPerGram != 0 && calsPerGram != 0)
                                 break;
                         }
-                        if (fatPerGram != 0 && proteinPerGram != 0 && carbsPerGram != 0 && calsPerGram != 0)
-                            break;
-                    }
+                        catch(Exception ex){
 
+                        }
+                        
+                    }
+                    if (calsPerGram == 0)
+                        calsPerGram = (proteinPerGram * 4 + carbsPerGram * 4 + fatPerGram * 9);
                     // This section will decide serving size of food
                     double calsPerMeal = calorieCount / mealNum;
                     double proteinPerMeal = proteinCount / mealNum;
@@ -183,19 +187,19 @@ namespace SmartDietCapstone
                     // Protein
                     if (j == 0)
                     {
-                        double servingSize = (proteinPerMeal - proteinPerMeal * 0.05) / proteinPerGram;
-
-
-                        double caloriesOfFood = calsPerGram * servingSize;
                         
-                            
+                        double servingSize = (proteinPerMeal - proteinPerMeal * 0.05) / proteinPerGram;
+                        double caloriesOfFood = calsPerGram * servingSize;
+                        if (caloriesOfFood > calsPerMeal + calsPerMeal * 0.1)
+                            servingSize = (calsPerMeal + calsPerMeal * 0.1) / calsPerGram;
                         food.servingSize = Math.Round(servingSize);
                         food.carbs = Math.Round(carbsPerGram * servingSize);
                         food.protein = Math.Round(proteinPerGram * servingSize);
                         food.fat = Math.Round(fatPerGram * servingSize);
                         food.cals = Math.Round(calsPerGram * servingSize);
-                        if (!(food.carbs >= food.protein)! && !(food.fat >= food.protein) || food.cals <= calsPerMeal + calsPerMeal * 0.1)
+                        if (!(food.carbs >= food.protein)! && !(food.fat >= food.protein) || food.cals <= calsPerMeal + calsPerMeal * 0.1 || food.cals < 1)
                             validFoodChoice = true;
+                        
                     }
                     // Carb food
                     else if (j == 1)
@@ -341,7 +345,7 @@ namespace SmartDietCapstone
                     // Only grab a new food if remaining calories is greater than 5% of the total calorie count
                     if(calsRemaining > calorieCount / mealNum * 0.05)
                     {
-                        meal.AddFood(await SearchFood(queries[j], j, calsRemaining, proteinRemaining, fatRemaining, carbsRemaining, mealNum));
+                        meal.AddFood(await CalculateFood(queries[j], j, calsRemaining, proteinRemaining, fatRemaining, carbsRemaining, mealNum));
                         // Calculate remaining macros for meal
                         calsRemaining -= meal.totalCals;
                         proteinRemaining -= meal.totalProtein;

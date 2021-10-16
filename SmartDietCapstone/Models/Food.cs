@@ -16,7 +16,7 @@ namespace SmartDietCapstone
             this.carbs = carbs;
             this.fat = fat;
         }
-
+        public int fdcId { get; set; }
         public double servingSize { get; set; }
         public string name { get; set; }
         public double cals { get; set; }

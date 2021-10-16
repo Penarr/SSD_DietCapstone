@@ -4,6 +4,10 @@
 
 <h1>Diet</h1>
 <div class="text-center">
+    @if(Model._diet == null)
+            {
+                <p class="text-danger">Please reenter valid information</p>
+            }
     <h3>User Details</h3>
     <row class="justify-content-around">
         <div class="col-md-6">
@@ -23,10 +27,10 @@
         </div>
 
         <h3>Meal Recommendations</h3>
-        @foreach (Meal meal in Model.diet)
+        @for (int i = 0; i < Model._diet.Count; i++)
         {
             <div class="row justify-content-around">
-                @foreach (Food food in meal.foods)
+                @foreach (Food food in Model._diet[i].foods)
                 {
                     <div class="col-md-6">
                         <h5>@food.name</h5>
@@ -39,17 +43,44 @@
 
             <div class="row justify-content-around">
                 <div class="col-md">Calories</div>
-                <div class="col-md">@meal.totalCals</div>
+                <div class="col-md">@Model._diet[i].totalCals</div>
             </div>
 
             <div class="row justify-content-around">
-                <div class="col-sm"><a href="#" class="btn btn-success">Save</a></div>
-                <div class="col-sm"><a href="#" class="btn btn-info">Edit</a></div>
-                <div class="col-sm"><a href="#" class="btn btn-danger">Delete</a></div>
+
+                <div class="col-sm">
+                    <button class="btn btn-success" type="button" value="@i">Save</button>
+                </div>
+                <div class="col-sm">
+                    <form method="post" asp-page-handler="TryEditMeal">
+
+                        <input type="hidden" value="@i" name="mealIndex" />
+                        <button type="submit" class="btn btn-info edit-button" value="Submit">Edit</button>
+                    </form>
+                    
+                </div>
+                <div class="col-sm"><button type="button" class="btn btn-danger" value="@i">Delete</button></div>
             </div>
         }
 
 </div>
+
+@section Scripts{
+    <script>
+        $(".edit-button").click(function () {
+            let mealIndex = $(this).val();
+            console.log("clicked");
+            $.ajax({
+                url: "/?handler=TryEditMeal",
+                data: {
+                    mealIndex: mealIndex
+                }
+            });
+        });
+
+    </script>
+
+}
 
 
 

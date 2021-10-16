@@ -15,33 +15,19 @@ namespace SmartDietCapstone.Pages
 {
     public class DietModel : PageModel
     {
-        private HttpClient _client;
-        public List<Meal> diet;
+        
+        public List<Meal> _diet;
         public FoodCalculator foodCalculator;
         public double dietCalories;
-        public DietModel(HttpClient client)
-        {
-            _client = client;
-            
-            
+        public DietModel() { }
 
-        }
+
         public void OnGet()
         {
-            var _diet = "";
-            var _calculator = "";
-            if (HttpContext.Session.Keys.Contains("diet"))
-            {
-                _diet = HttpContext.Session.GetString("diet");
-            }
-            if (HttpContext.Session.Keys.Contains("calculator"))
-            {
-                _calculator = HttpContext.Session.GetString("calculator");
-            }
-            this.diet = JsonConvert.DeserializeObject<List<Meal>>(_diet);
-            this.foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(_calculator);
+            SetDietAndCalculator();
             dietCalories = 0;
-            foreach (Meal meal in diet)
+            
+            foreach (Meal meal in _diet)
             {
                 foreach (Food food in meal.foods)
                 {
@@ -49,7 +35,32 @@ namespace SmartDietCapstone.Pages
                 }
             }
         }
+        private void SetDietAndCalculator()
+        {
+            var diet = "";
+            var calculator = "";
 
+            if (HttpContext.Session.Keys.Contains("diet"))
+                diet = HttpContext.Session.GetString("diet");
+
+
+            if (HttpContext.Session.Keys.Contains("calculator"))
+                calculator = HttpContext.Session.GetString("calculator");
+
+            this._diet = JsonConvert.DeserializeObject<List<Meal>>(diet);
+            this.foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(calculator);
+        }
+        public async Task<IActionResult> OnPostTryEditMeal(int mealIndex)
+        {
+            SetDietAndCalculator();
+
+            Meal meal = _diet[mealIndex];
+            string jsonMeal = JsonConvert.SerializeObject(meal);
+            TempData["meal"] = jsonMeal;
+            return new RedirectToPageResult("EditMeal");
+        }
+
+        
        
 
         

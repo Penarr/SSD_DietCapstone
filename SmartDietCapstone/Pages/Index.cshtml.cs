@@ -13,8 +13,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Session;
 using Microsoft.AspNetCore.Http;
-
-
+using SmartDietCapstone.Helpers;
 
 namespace SmartDietCapstone.Pages
 {
@@ -28,13 +27,13 @@ namespace SmartDietCapstone.Pages
 
         [Required]
         [BindProperty]
-        [Range(1,1000)]
+        [Range(1, 1000)]
         public double weight { get; set; }
 
         private readonly ILogger<IndexModel> _logger;
         private readonly HttpClient _client;
         private IConfiguration _configuration;
-        
+
         public IndexModel(ILogger<IndexModel> logger, HttpClient client, IConfiguration configuration)
         {
             _logger = logger;
@@ -50,26 +49,26 @@ namespace SmartDietCapstone.Pages
             string apiKey = _configuration["Secrets:FDCApiKey"];
             string apiUrl = _configuration["Secrets:FDCApi"];
             double height = inchSelect + feetSelect * 12;
+            APICaller caller = new APICaller(apiUrl, apiKey, _client);
 
-            
-            
-         
-            
+
+
+
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
                 errors = errors.ToList();
-               
+
                 return new PageResult();
             }
             else
             {
-                FoodCalculator foodCalculator = new FoodCalculator(_client, genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect, apiUrl, apiKey);
+                FoodCalculator foodCalculator = new FoodCalculator(genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect, caller);
 
 
-                
-              
-                
+
+
+
                 var diet = await foodCalculator.GenerateDiet(mealNumSelect);
                 var jsonDiet = JsonConvert.SerializeObject(diet);
                 var jsonCalculator = JsonConvert.SerializeObject(foodCalculator);
@@ -77,18 +76,17 @@ namespace SmartDietCapstone.Pages
                 HttpContext.Session.SetString("calculator", jsonCalculator);
 
 
-                
-              
+
+
                 return new RedirectToPageResult("Diet");
             }
-           
-            
 
-            
-
+        }
+        public JsonResult OnGetTest()
+        {
+            return new JsonResult("test");
         }
 
 
-       
     }
 }

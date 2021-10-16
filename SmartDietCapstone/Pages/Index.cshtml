@@ -176,7 +176,15 @@
     </form>
 </div>
 
-@*@section Scripts{
-
-}*@
+@section Scripts{
+<script>
+    $.ajax({
+        url: "/?handler=Test",
+    }).done(function (result) {
+        console.log(result);
+    });
+</script>
+    
+})
+}
             
