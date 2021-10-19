@@ -31,6 +31,8 @@ namespace SmartDietCapstone.Pages
             }
 
         }
+        
+
 
 
         public async Task<JsonResult> OnGetFoodSearch(string query)
@@ -39,8 +41,31 @@ namespace SmartDietCapstone.Pages
             return  new JsonResult(searchedFoods);
         }
 
-        public async void AddFoodToMeal(Food food)
+
+        public ActionResult SaveMeal(Meal meal)
         {
+            TempData["meal"] = JsonConvert.SerializeObject(meal);
+
+            return new RedirectToPageResult("Diet", "EditDiet");
+        }
+        public  void OnPostValidateMeal(string jsonFoods)
+        {
+            List<Food> foods = JsonConvert.DeserializeObject<List<Food>>(jsonFoods);
+            if (foods.Count > 0)
+            {
+                Meal meal = new Meal();
+                meal.foods = foods;
+                foreach(Food food in meal.foods)
+                {
+                    meal.totalCals += food.cals;
+                    meal.totalProtein += food.protein;
+                    meal.totalCarbs += food.carbs;
+                    meal.totalFat += food.fat;
+                }
+
+                SaveMeal(meal);
+            }
+                
 
         }
     }

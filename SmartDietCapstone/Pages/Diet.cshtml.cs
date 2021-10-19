@@ -50,20 +50,50 @@ namespace SmartDietCapstone.Pages
             this._diet = JsonConvert.DeserializeObject<List<Meal>>(diet);
             this.foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(calculator);
         }
-        public async Task<IActionResult> OnPostTryEditMeal(int mealIndex)
+
+        public void OnPostValidateMealExists(int mealIndex)
+        {
+            SetDietAndCalculator();
+            if (_diet.Count > mealIndex)
+            {
+                Meal meal = _diet[mealIndex];
+
+                string jsonMeal = JsonConvert.SerializeObject(meal);
+                HttpContext.Session.SetInt32("mealIndex", mealIndex);
+                TempData["meal"] = jsonMeal;
+                GoToEditMeal();
+                
+            }
+        }
+        public IActionResult GoToEditMeal() =>  new RedirectToPageResult("EditMeal");
+
+        public void EditDiet()
         {
             SetDietAndCalculator();
 
-            Meal meal = _diet[mealIndex];
-            string jsonMeal = JsonConvert.SerializeObject(meal);
-            TempData["meal"] = jsonMeal;
-            return new RedirectToPageResult("EditMeal");
+            if (HttpContext.Session.Keys.Contains("mealIndex"))
+            {
+                int mealIndex = (int)HttpContext.Session.GetInt32("mealIndex");
+                _diet[mealIndex] = JsonConvert.DeserializeObject<Meal>(TempData["meal"] as string);
+            }
+                
+
+        }
+        public void SaveDiet()
+        {
+
         }
 
-        
-       
 
-        
+
+
+
+
+
+
+
+
+
 
     }
 }

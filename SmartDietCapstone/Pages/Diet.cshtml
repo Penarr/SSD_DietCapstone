@@ -59,7 +59,7 @@
                     </form>
                     
                 </div>
-                <div class="col-sm"><button type="button" class="btn btn-danger" value="@i">Delete</button></div>
+                <div class="col-sm"><button type="button" class="btn btn-danger delete-button" value="@i">Delete</button></div>
             </div>
         }
 
@@ -71,13 +71,17 @@
             let mealIndex = $(this).val();
             console.log("clicked");
             $.ajax({
-                url: "/?handler=TryEditMeal",
+                url: "/?handler=ValidateMealExists",
                 data: {
                     mealIndex: mealIndex
                 }
             });
         });
 
+        $(".delete-button").click(function () {
+
+
+        });
     </script>
 
 }
