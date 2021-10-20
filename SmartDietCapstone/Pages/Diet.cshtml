@@ -2,96 +2,93 @@
 @model SmartDietCapstone.Pages.DietModel
 @using Models
 
-<h1>Diet</h1>
-<div class="text-center">
-    @if(Model._diet == null)
-            {
-                <p class="text-danger">Please reenter valid information</p>
-            }
-    <h3>User Details</h3>
-    <row class="justify-content-around">
-        <div class="col-md-6">
-            <p><strong>Recommended Daily Caloric Intake:</strong></p>
-        </div>
-        <div class="col-md-2">
-            <p>@Model.foodCalculator.calorieCount calories</p>
-        </div>
 
-        <div class="row justify-content-around">
+<div class="text-center">
+
+    <h1>Diet</h1>
+    @if (Model._diet == null && Model.foodCalculator == null)
+    {
+
+
+        <p class="text-danger">Please reenter valid information</p>
+
+    }
+    else
+    {
+        <h3>User Details</h3>
+        <div class="row justify-content-between">
             <div class="col-md-6">
-                <p><strong>Total Calories of Generated Meal Plan:</strong></p>
+                <p>
+                    <strong>Recommended Daily Caloric Intake:</strong>
+
+                    @Model.foodCalculator.calorieCount calories
+                </p>
             </div>
-            <div class="col-md-2">
-                @Model.dietCalories calories
+
+
+            <div class="col-md-6">
+                <p><strong>Total Calories of Generated Meal Plan:</strong> @Model.dietCalories calories</p>
             </div>
         </div>
 
         <h3>Meal Recommendations</h3>
         @for (int i = 0; i < Model._diet.Count; i++)
         {
-            <div class="row justify-content-around">
-                @foreach (Food food in Model._diet[i].foods)
-                {
-                    <div class="col-md-6">
-                        <h5>@food.name</h5>
-                    </div>
-                    <div class="col-md-2">
-                        <p>@food.servingSize grams</p>
-                    </div>
-                }
-            </div>
-
-            <div class="row justify-content-around">
-                <div class="col-md">Calories</div>
-                <div class="col-md">@Model._diet[i].totalCals</div>
-            </div>
-
-            <div class="row justify-content-around">
-
-              
-                <div class="col-sm">
-                    <form method="post" asp-page-handler="GoToEditMeal">
-
-                        <input type="hidden" value="@i" name="mealIndex" />
-                        <button type="submit" class="btn btn-info edit-button" value="Submit">Edit</button>
-                    </form>
-                    
+            <div class="container-md">
+                <br />
+                <div class="row justify-content-around">
+                    @foreach (Food food in Model._diet[i].foods)
+                    {
+                        <div class="col-md-6">
+                            <h5>@food.name</h5>
+                        </div>
+                        <div class="col-md-2">
+                            <p>@food.servingSize grams</p>
+                        </div>
+                    }
                 </div>
-                <form method="post" asp-page-handler="DeleteMeal">
 
-                    <input type="hidden" value="@i" name="deleteIndex" />
-                    <button type="submit" class="btn btn-danger edit-button" value="Submit">Delete</button>
-                </form>
+
+                <p><strong>Calories:</strong> &nbsp;&nbsp;@Model._diet[i].totalCals</p>
+
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <form method="post" asp-page-handler="GoToEditMeal">
+
+                            <input type="hidden" value="@i" name="mealIndex" />
+                            <button type="submit" class="btn btn-info edit-button" value="Submit">Edit</button>
+                        </form>
+
+                    </div>
+                    <div class="col">
+                        <form method="post" asp-page-handler="DeleteMeal">
+
+                            <input type="hidden" value="@i" name="deleteIndex" />
+                            <button type="submit" class="btn btn-danger edit-button" value="Submit">Delete</button>
+                        </form>
+                    </div>
+
+                </div>
+                <br />
             </div>
 
-
-
-            <form method="post" asp-page-handler="SaveDiet">
-                <button type="submit" class="btn btn-primary" value="Submit">Save Diet</button>
-
-            </form>
+            <br /><br />
         }
+
+    }
+
+    <form method="post" asp-page-handler="SaveDiet">
+        <button type="submit" class="btn btn-primary" value="Submit">Save Diet</button>
+
+    </form>
 
 </div>
 
+
+
+
+
 @section Scripts{
-    <script>
-        $(".edit-button").click(function () {
-            let mealIndex = $(this).val();
-            console.log("clicked");
-            $.ajax({
-                url: "/?handler=ValidateMealExists",
-                data: {
-                    mealIndex: mealIndex
-                }
-            });
-        });
-
-        $(".delete-button").click(function () {
-
-
-        });
-    </script>
 
 }
 

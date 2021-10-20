@@ -178,17 +178,12 @@ else
 }
 
 
-
-
-
-
-
-
 @section Scripts{
     @if (Model.meal != null)
     {
         <script>
-        $(document).ready(function () {
+            $(document).ready(function () {
+            // Global variables of meal informawtion
             var foods = @Json.Serialize(Model.meal.foods);
             var totalCals = @Json.Serialize(Model.meal.totalCals);
             var totalProtein = @Json.Serialize(Model.meal.totalProtein);
@@ -196,15 +191,16 @@ else
             var totalFat = @Json.Serialize(Model.meal.totalFat);
             var currentIndex = 0;
 
-
+            // Global variables of macros per gram of a food being edited
             var calsPerGram;
             var proteinPerGram;
             var fatPerGram;
             var carbsPerGram;
+        // Searches FDC food database, then shows results on table in modal
         $("#searchButton").click(function () {
             let query = $("#searchBar").val();
 
-            $.ajax({
+            $.ajax({ // AJAX REQUEST
                 url: "/EditMeal?handler=FoodSearch",
                 data: {
                     query: query
@@ -215,20 +211,20 @@ else
                 }
             }).done(function (data) {
 
-                $("searchBody").html("");
+                $("searchBody").html(""); // CLEARS TABLE OF CURRENT RESULTS
                 for (i = 0; i < data.length; i++) {
                     food = data[i];
                     var addFoodButton = $("<button>", { "class": "btn btn-success add-food-button", "type": "button", "text": "Add Food" }).click(function () {
 
                         foods.push(food);
                         repopulateCurrentMeal();
-                    });
-                    console.log(addFoodButton);
+                    }); // BUTTON THAT WILL ADD FOOD RESULT TO DIET WHEN CLICKED.
+                   
                      var foodRow = $("<tr> <td>" + food.name + "</td> <td>" + food.cals + "</td> <td>" +
                          food.protein + "</td> <td>" + food.carbs + "</td> <td>" + food.fat + "</td><td></td></tr>");
 
-                    $("td:last", foodRow).append(addFoodButton);
-                    $("#searchBody").append(foodRow);
+                    $("td:last", foodRow).append(addFoodButton); // ADDS BUTTON TO LAST CELL IN TABLE ROW
+                    $("#searchBody").append(foodRow); //APPENDS ROW TO SEARCH BODY
                 }
 
             }).fail(function (error) { console.log(error); });
@@ -245,10 +241,7 @@ else
                 proteinPerGram = food.protein / food.servingSize;
                 carbsPerGram = food.carbs / food.servingSize;
                 fatPerGram = food.fat / food.servingSize;
-                console.log(calsPerGram);
-                console.log(proteinPerGram);
-                console.log(carbsPerGram);
-                console.log(fatPerGram);
+           
                 $("#foodNameCell").html(food.name);
                 $("#servingSizeInput").val(food.servingSize);
                 $("#calsInput").val(food.cals);
@@ -259,14 +252,14 @@ else
                 $("#servingSizeInput").change(changeFoodMacros);
 
         });
-
+            // Calculates macros based on serving size. Rounds to 2 decimals
             function changeFoodMacros() {
 
                 let servingSize = $("#servingSizeInput").val();
-                $("#calsInput").val(calsPerGram * servingSize);
-                $("#proteinInput").val(proteinPerGram * servingSize);
-                $("#carbsInput").val(carbsPerGram * servingSize);
-                $("#fatInput").val(fatPerGram * servingSize);
+                $("#calsInput").val(Math.round(calsPerGram * servingSize * 100) / 100);
+                $("#proteinInput").val(Math.round(proteinPerGram * servingSize * 100) / 100);
+                $("#carbsInput").val(Math.round(carbsPerGram * servingSize * 100) / 100);
+                $("#fatInput").val(Math.round(fatPerGram * servingSize * 100) / 100);
             }
             // Saves changes to food currently being edited
             $("#save-changes").click(function () {
@@ -330,26 +323,10 @@ else
 
             }
 
-
+            // If foods array is over 0, save foods as a json string
             $("#saveMeal").click(function () {
                 if (foods.length > 0) {
-
                     $("#jsonFoods").val(JSON.stringify(foods));
-                    //    var jsonFoods = JSON.stringify(foods);
-                    //    $.ajax({
-                    //        url: "/EditMeal?handler=ValidateMeal",
-                    //        data: {
-                    //            jsonFoods: jsonFoods
-                    //        },
-
-                    //        headers: {
-                    //            RequestVerificationToken:
-                    //                $('input:hidden[name="__RequestVerificationToken"]').val()
-                    //        }
-                    //    });
-                    //} else {
-                    //    $("#saveMealError").html("Cannot save a meal with no foods. Please add some food to the meal.")
-                    //}
                 }
             });
         });

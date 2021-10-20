@@ -6,17 +6,17 @@
 }
 
 
-<div class="text-center">
+<div class="text-center container-sm">
     <h1 class="display-4">Smart Meals</h1>
     <h3>Enter Your Info</h3>
 
     <h4>Info About You:</h4>
     <form method="post">
-        <div class="row justify-content-between">
-            <div class="col-md-4">
+        <div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <strong>Gender</strong>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 
                 <select name="genderSelect" id="genderSelect" class="form-control">
                     <option value="male" selected>Male</option>
@@ -24,11 +24,11 @@
                 </select>
             </div>
         </div>
-        <div class="row justify-content-between">
-            <div class="col-md-4">
+        <div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <strong>Age</strong>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 @Html.TextBoxFor(m=>m.age, new { @value="", @class = "form-control", max = "115", type = "number" })
                 <p class="text-danger">@Html.ValidationMessageFor(m=>m.age)</p>
                 
@@ -36,21 +36,21 @@
             </div>
         </div>
 
-        <div class="row justify-content-between">
-            <div class="col-md-4">
+        <div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <strong>Weight (lbs)</strong>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 @Html.TextBoxFor(m => m.weight, new { @value = "", @class = "form-control", max = "800", type = "number", min = "60"})
                 <p class="text-danger">@Html.ValidationMessageFor(m => m.weight)</p>
             </div>
         </div>
 
-        <div class="row justify-content-between">
-            <div class="col-md-4">
+        <div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <strong>Height</strong>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <div class="row">
                     <div class="col">
                         <select name="feetSelect" id="feetSelect" class="form-control">
@@ -82,11 +82,11 @@
                 </div>
             </div>
         </div>
-        <div class="row justify-content-between">
-            <div class="col-md-4">
+        <div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <strong>Activity Level</strong>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <select name="activitySelect" id="activitySelect" class="form-control">
                     <option value="0" selected>Sedentary</option>
                     <option value="1">Light Exercise (1-2 times a week)</option>
@@ -97,11 +97,11 @@
                 </select>
             </div>
         </div>
-        <div class="row justify-content-between">
-            <div class="col-md-4">
+        <div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <strong>Goal</strong>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <select name="goalSelect" id="goalSelect" class="form-control">
                     <option value="0" selected>Weight Loss</option>
                     <option value="1">Maintenance</option>
@@ -109,13 +109,13 @@
                 </select>
             </div>
         </div>
-
+        <br />
         <h4>Food Preferences:</h4>
-        <!--<div class="row justify-content-between">
-            <div class="col-md-4 ">
+        <!--<div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4 ">
                 <strong>Diet Type? (Check all that apply)</strong>
             </div>
-            <div class="col-md-4 text-left">
+            <div class="col-lg-2 col-sm-5 col-md-4 text-left">
 
 
                 @Html.CheckBox("isGlutenFree", false)
@@ -143,11 +143,11 @@
                 <!--</select>-->
             <!--</div>
         </div>-->
-        <div class="row justify-content-between">
-            <div class="col-md-4">
+        <div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <strong>Please pick your carb intake</strong>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <select name="carbNumSelect" id="carbNumSelect" class="form-control">
                     <option value="1">Low</option>
                     <option value="2" selected>Medium</option>
@@ -156,11 +156,11 @@
             </div>
         </div>
         
-        <div class="row justify-content-between">
-            <div class="col-md-4">
+        <div class="row justify-content-around">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <strong>How Many Meals a Day?</strong>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-2 col-sm-5 col-md-4">
                 <select name="mealNumSelect" id="mealNumSelect" class="form-control">
                     <option value="1" >1</option>
                     <option value="2">2</option>
@@ -171,7 +171,7 @@
                 </select>
             </div>
         </div>
-        
+        <br />
         <input type="submit" class="btn btn-primary" />
     </form>
 </div>
