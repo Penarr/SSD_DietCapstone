@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ using SmartDietCapstone.Models;
 
 namespace SmartDietCapstone.Pages
 {
+    [Authorize(Roles="User")]
     public class EditMealModel : PageModel
     {
         private APICaller caller;
@@ -31,10 +33,6 @@ namespace SmartDietCapstone.Pages
             }
 
         }
-        
-
-
-
         public async Task<JsonResult> OnGetFoodSearch(string query)
         {
             searchedFoods = await caller.GetListOfSearchedFoods(query);
@@ -42,13 +40,8 @@ namespace SmartDietCapstone.Pages
         }
 
 
-        public ActionResult SaveMeal(Meal meal)
-        {
-            TempData["meal"] = JsonConvert.SerializeObject(meal);
-
-            return new RedirectToPageResult("Diet", "EditDiet");
-        }
-        public  void OnPostValidateMeal(string jsonFoods)
+        
+        public  ActionResult OnPostValidateMeal(string jsonFoods)
         {
             List<Food> foods = JsonConvert.DeserializeObject<List<Food>>(jsonFoods);
             if (foods.Count > 0)
@@ -63,9 +56,11 @@ namespace SmartDietCapstone.Pages
                     meal.totalFat += food.fat;
                 }
 
-                SaveMeal(meal);
+                TempData["meal"] = JsonConvert.SerializeObject(meal);
+
+                return new RedirectToPageResult("Diet", "EditDiet");
             }
-                
+            return new PageResult();
 
         }
     }

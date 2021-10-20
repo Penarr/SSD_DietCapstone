@@ -19,7 +19,7 @@ namespace SmartDietCapstone.Areas.Identity.Data
         public override string Email { get; set; }
 
         [Phone]
-        public override string? PhoneNumber { get; set; }
+        public override string PhoneNumber { get; set; }
         [DataType(DataType.Date)]
         public DateTime? BirthDate { get; set; }
     }

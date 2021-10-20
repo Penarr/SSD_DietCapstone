@@ -65,10 +65,6 @@ namespace SmartDietCapstone.Pages
             {
                 FoodCalculator foodCalculator = new FoodCalculator(genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect, caller);
 
-
-
-
-
                 var diet = await foodCalculator.GenerateDiet(mealNumSelect);
                 var jsonDiet = JsonConvert.SerializeObject(diet);
                 var jsonCalculator = JsonConvert.SerializeObject(foodCalculator);

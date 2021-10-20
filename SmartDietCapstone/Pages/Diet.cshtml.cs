@@ -10,9 +10,11 @@ using Newtonsoft.Json;
 using SmartDietCapstone.Models;
 using Microsoft.AspNetCore.Session;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartDietCapstone.Pages
 {
+  
     public class DietModel : PageModel
     {
         
@@ -21,7 +23,10 @@ namespace SmartDietCapstone.Pages
         public double dietCalories;
         public DietModel() { }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        
         public void OnGet()
         {
             SetDietAndCalculator();
@@ -35,6 +40,9 @@ namespace SmartDietCapstone.Pages
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
         private void SetDietAndCalculator()
         {
             var diet = "";
@@ -51,7 +59,15 @@ namespace SmartDietCapstone.Pages
             this.foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(calculator);
         }
 
-        public void OnPostValidateMealExists(int mealIndex)
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mealIndex"></param>
+        /// <returns></returns>\
+        
+        public IActionResult OnPostGoToEditMeal(int mealIndex)
         {
             SetDietAndCalculator();
             if (_diet.Count > mealIndex)
@@ -61,25 +77,60 @@ namespace SmartDietCapstone.Pages
                 string jsonMeal = JsonConvert.SerializeObject(meal);
                 HttpContext.Session.SetInt32("mealIndex", mealIndex);
                 TempData["meal"] = jsonMeal;
-                GoToEditMeal();
-                
-            }
-        }
-        public IActionResult GoToEditMeal() =>  new RedirectToPageResult("EditMeal");
+                return new RedirectToPageResult("EditMeal");
 
-        public void EditDiet()
+            }
+
+            return new PageResult();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dietIndex"></param>
+        /// <returns></returns>
+        public IActionResult OnPostDeleteMeal(int deleteIndex)
+        {
+            SetDietAndCalculator();
+            if (_diet.Count > deleteIndex)
+            {
+                _diet.RemoveAt(deleteIndex);
+
+                HttpContext.Session.SetString("diet", JsonConvert.SerializeObject(_diet));
+                return new RedirectToPageResult("Diet");
+
+            }
+
+
+            return new PageResult();
+        }
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        public void OnGetEditDiet()
         {
             SetDietAndCalculator();
 
             if (HttpContext.Session.Keys.Contains("mealIndex"))
             {
                 int mealIndex = (int)HttpContext.Session.GetInt32("mealIndex");
-                _diet[mealIndex] = JsonConvert.DeserializeObject<Meal>(TempData["meal"] as string);
-            }
+                if (TempData.ContainsKey("meal"))
+                {
+                    _diet[mealIndex] = JsonConvert.DeserializeObject<Meal>(TempData["meal"] as string);
+                    HttpContext.Session.SetString("diet", JsonConvert.SerializeObject(_diet));
+                }
+                    
                 
-
+            }
+            
         }
-        public void SaveDiet()
+
+     
+
+
+
+
+        public void FavouriteDiet()
         {
 
         }
