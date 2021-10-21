@@ -21,7 +21,7 @@ namespace SmartDietCapstone.Areas.Identity
                         context.Configuration.GetConnectionString("DefaultConnection")));
 
                 services.AddIdentity<SmartDietCapstoneUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
-                    .AddEntityFrameworkStores<SmartDietCapstoneContext>();
+                    .AddEntityFrameworkStores<SmartDietCapstoneContext>().AddDefaultUI().AddDefaultTokenProviders();
 
                 
                 
