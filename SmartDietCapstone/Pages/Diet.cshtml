@@ -54,7 +54,6 @@
                 <div class="row justify-content-center">
                     <div class="col">
                         <form method="post" asp-page-handler="GoToEditMeal">
-
                             <input type="hidden" value="@i" name="mealIndex" />
                             <button type="submit" class="btn btn-info edit-button" value="Submit">Edit</button>
                         </form>
@@ -62,7 +61,6 @@
                     </div>
                     <div class="col">
                         <form method="post" asp-page-handler="DeleteMeal">
-
                             <input type="hidden" value="@i" name="deleteIndex" />
                             <button type="submit" class="btn btn-danger edit-button" value="Submit">Delete</button>
                         </form>
@@ -75,12 +73,14 @@
             <br /><br />
         }
 
+        <form method="post" asp-page-handler="SaveDiet">
+            <button type="submit" class="btn btn-primary" value="Submit">Save Diet</button>
+
+        </form>
+
     }
 
-    <form method="post" asp-page-handler="SaveDiet">
-        <button type="submit" class="btn btn-primary" value="Submit">Save Diet</button>
 
-    </form>
 
 </div>
 

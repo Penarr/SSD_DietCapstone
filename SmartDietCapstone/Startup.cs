@@ -40,8 +40,7 @@ namespace SmartDietCapstone
                 options.Cookie.IsEssential = true;
             });
 
-            //services.AddDbContext<SmartDietCapstoneContext>(options =>
-            //options.UseSqlServer(Configuration.GetConnectionString("ConnectionStrings: DefaultConnection")));
+     
             services.AddDatabaseDeveloperPageExceptionFilter();
         }
 

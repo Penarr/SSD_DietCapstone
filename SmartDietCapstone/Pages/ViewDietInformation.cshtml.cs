@@ -1,29 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SmartDietCapstone.Models;
-using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
+using SmartDietCapstone.Models;
 
 namespace SmartDietCapstone.Pages
 {
-    [Authorize(Roles = "User")]
-    public class AccountModel : PageModel
+    public class ViewDietInformationModel : PageModel
     {
+
+
         private IConfiguration _configuration;
         List<List<Meal>> favouriteDiets;
-        public AccountModel(IConfiguration configuration)
+        public ViewDietInformationModel(IConfiguration configuration)
         {
             _configuration = configuration;
-            favouriteDiets = new List <List<Meal>>();
+            favouriteDiets = new List<List<Meal>>();
             GetFavouriteDiets();
         }
 
@@ -65,16 +64,16 @@ namespace SmartDietCapstone.Pages
 
         public IActionResult EditFavouriteDiet(int dietIndex)
         {
-            if(dietIndex < favouriteDiets.Count)
+            if (dietIndex < favouriteDiets.Count)
             {
                 string jsonDiet = JsonConvert.SerializeObject(favouriteDiets[dietIndex]);
                 HttpContext.Session.SetString("diet", jsonDiet);
-                HttpContext.Session.SetString("calculator", jsonCalculator);
-            }
-           
-            
 
-            
+            }
+
+
+
+
             return new PageResult();
         }
         /// <summary>
@@ -106,4 +105,3 @@ namespace SmartDietCapstone.Pages
         }
     }
 }
-

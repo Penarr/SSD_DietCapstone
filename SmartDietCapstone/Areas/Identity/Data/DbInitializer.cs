@@ -14,31 +14,32 @@ namespace SSD_Lab1.Data
 {
     public static class DbInitializer
     {
-        public static AppSecrets appSecrets { get; set; }
+       // public static AppSecrets appSecrets { get; set; }
         public static async Task<int> SeedUsersAndRoles(IServiceProvider serviceProvider)
         {
             // create the database if it doesn't exist
             var context = serviceProvider.GetRequiredService<SmartDietCapstoneContext>();
             context.Database.Migrate();
 
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<SmartDietCapstoneUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            
 
             // Check if roles already exist and exit if there are
-            if (roleManager.Roles.Count() > 0)
-                return 1;  // should log an error message here
+            //if (roleManager.Roles.Count() > 0)
+            //    return 1;  // should log an error message here
 
             // Seed roles
-            int result = await SeedRoles(roleManager);
-            if (result != 0)
-                return 2;  // should log an error message here
+            //int result = await SeedRoles(roleManager);
+            //if (result != 0)
+            //    return 2;  // should log an error message here
 
             // Check if users already exist and exit if there are
-            if (userManager.Users.Count() > 0)
-                return 3;  // should log an error message here
+            //if (userManager.Users.Count() > 0)
+            //    return 3;  // should log an error message here
 
             // Seed users
-            result = await SeedUsers(userManager);
+           var result = await SeedUsers(userManager);
             if (result != 0)
                 return 4;  // should log an error message here
 
@@ -64,22 +65,22 @@ namespace SSD_Lab1.Data
         private static async Task<int> SeedUsers(UserManager<SmartDietCapstoneUser> userManager)
         {
             // Create Manager User
-            var managerUser = new SmartDietCapstoneUser
+            var admin = new SmartDietCapstoneUser
             {
-                UserName = "the.admin@mohawkcollege.ca",
-                Email = "the.admin@mohawkcollege.ca",
-                FirstName = "The",
-                LastName = "Manager",
-                PhoneNumber = "123456789",
-                BirthDate = DateTime.Today,
+                UserName = "penarr",
+                Email = "penarr@dietcapstone.ca",
+                //FirstName = "Rob",
+                //LastName = "Peña",
+                //PhoneNumber = "123456789",
+                //BirthDate = DateTime.Today,
                 EmailConfirmed = true
             };
-            var result = await userManager.CreateAsync(managerUser, appSecrets.AdminPwd);
+            var result = await userManager.CreateAsync(admin, "Pa55word!");
             if (!result.Succeeded)
                 return 1;  // should log an error message here
 
             // Assign user to Admin role
-            result = await userManager.AddToRoleAsync(managerUser, "Manager");
+            result = await userManager.AddToRoleAsync(admin, "Admin");
             if (!result.Succeeded)
                 return 2;  // should log an error message here
 

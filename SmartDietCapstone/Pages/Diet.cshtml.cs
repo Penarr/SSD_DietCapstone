@@ -31,14 +31,17 @@ namespace SmartDietCapstone.Pages
         {
             SetDietAndCalculator();
             dietCalories = 0;
-
-            foreach (Meal meal in _diet)
+            if(_diet != null)
             {
-                foreach (Food food in meal.foods)
+                foreach (Meal meal in _diet)
                 {
-                    dietCalories += food.cals;
+                    foreach (Food food in meal.foods)
+                    {
+                        dietCalories += food.cals;
+                    }
                 }
             }
+            
         }
         /// <summary>
         /// 

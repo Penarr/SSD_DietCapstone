@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SSD_Lab1.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,19 +15,13 @@ namespace SmartDietCapstone
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();//.Run();
+
+            using (var scope = host.Services.CreateScope())
+                DbInitializer.SeedUsersAndRoles(scope.ServiceProvider).Wait();
 
 
-            //var contfiguration = host.Services.GetService()
-            //var hosting = host.Services.GetService<IWebHostEnvironment>();
-
-            //if (hosting.IsDevelopment())
-            //{
-            //    var secrets = configuration.GetSection("Secrets").Get<AppSecrets>();
-            //    DbInitializer.appSecrets = secrets;
-            //}
-
-           
+            host.Run();
 
         }
 

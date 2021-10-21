@@ -15,12 +15,18 @@ namespace SmartDietCapstone.Areas.Identity
         public void Configure(IWebHostBuilder builder)
         {
             builder.ConfigureServices((context, services) => {
+               
                 services.AddDbContext<SmartDietCapstoneContext>(options =>
                     options.UseSqlServer(
-                        context.Configuration.GetConnectionString("SmartDietCapstoneContextConnection")));
+                        context.Configuration.GetConnectionString("DefaultConnection")));
 
-                services.AddDefaultIdentity<SmartDietCapstoneUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                services.AddIdentity<SmartDietCapstoneUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                     .AddEntityFrameworkStores<SmartDietCapstoneContext>();
+
+                
+                
+
+                
             });
         }
     }
