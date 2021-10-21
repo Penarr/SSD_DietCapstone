@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Session;
 using Microsoft.AspNetCore.Http;
 using SmartDietCapstone.Helpers;
+using SmartDietCapstone.Data;
 
 namespace SmartDietCapstone.Pages
 {
@@ -34,11 +35,13 @@ namespace SmartDietCapstone.Pages
         private readonly HttpClient _client;
         private IConfiguration _configuration;
 
-        public IndexModel(ILogger<IndexModel> logger, HttpClient client, IConfiguration configuration)
+        public IndexModel(ILogger<IndexModel> logger, HttpClient client, IConfiguration configuration, SmartDietCapstoneContext _context)
         {
             _logger = logger;
             _client = client;
             _configuration = configuration;
+            
+            
         }
 
         public async Task<IActionResult> OnPostAsync(string genderSelect, int age, double weight, int feetSelect, int inchSelect, int activitySelect, int goalSelect, bool isKeto, int carbNumSelect, int mealNumSelect)

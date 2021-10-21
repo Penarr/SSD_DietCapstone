@@ -14,10 +14,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace SmartDietCapstone.Pages
 {
-  
+
     public class DietModel : PageModel
     {
-        
+
         public List<Meal> _diet;
         public FoodCalculator foodCalculator;
         public double dietCalories;
@@ -26,12 +26,12 @@ namespace SmartDietCapstone.Pages
         /// <summary>
         /// 
         /// </summary>
-        
+
         public void OnGet()
         {
             SetDietAndCalculator();
             dietCalories = 0;
-            
+
             foreach (Meal meal in _diet)
             {
                 foreach (Food food in meal.foods)
@@ -55,8 +55,8 @@ namespace SmartDietCapstone.Pages
             if (HttpContext.Session.Keys.Contains("calculator"))
                 calculator = HttpContext.Session.GetString("calculator");
 
-            this._diet = JsonConvert.DeserializeObject<List<Meal>>(diet);
-            this.foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(calculator);
+            _diet = JsonConvert.DeserializeObject<List<Meal>>(diet);
+            foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(calculator);
         }
 
 
@@ -66,7 +66,7 @@ namespace SmartDietCapstone.Pages
         /// </summary>
         /// <param name="mealIndex"></param>
         /// <returns></returns>\
-        
+
         public IActionResult OnPostGoToEditMeal(int mealIndex)
         {
             SetDietAndCalculator();
@@ -103,7 +103,7 @@ namespace SmartDietCapstone.Pages
 
             return new PageResult();
         }
-       
+
         /// <summary>
         /// 
         /// </summary>
@@ -119,21 +119,13 @@ namespace SmartDietCapstone.Pages
                     _diet[mealIndex] = JsonConvert.DeserializeObject<Meal>(TempData["meal"] as string);
                     HttpContext.Session.SetString("diet", JsonConvert.SerializeObject(_diet));
                 }
-                    
-                
+
+
             }
-            
-        }
-
-     
-
-
-
-
-        public void FavouriteDiet()
-        {
 
         }
+
+
 
 
 
