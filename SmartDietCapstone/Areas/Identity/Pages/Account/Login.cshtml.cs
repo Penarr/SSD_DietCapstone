@@ -69,13 +69,21 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
+            if (Request.Query.ContainsKey("previousUrl"))
+                returnUrl = Request.Query["previousUrl"];
+            else 
+                returnUrl ??= Url.Content("~/");
+
             ReturnUrl = returnUrl;
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
-
+            if (Request.Query.ContainsKey("previousUrl"))
+                returnUrl = Request.Query["previousUrl"];
+            else 
+                returnUrl ??= Url.Content("~/");
+            
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         
             if (ModelState.IsValid)
@@ -85,7 +93,14 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    
                     _logger.LogInformation("User logged in.");
+                    var user = await _signInManager.UserManager.FindByNameAsync(Input.Email);
+                    var userPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
+
+                    var ok = User.Identity.IsAuthenticated;
+                  
+                   
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

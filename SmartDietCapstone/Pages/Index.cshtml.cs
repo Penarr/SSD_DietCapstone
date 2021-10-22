@@ -34,13 +34,14 @@ namespace SmartDietCapstone.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly HttpClient _client;
         private IConfiguration _configuration;
+        private SmartDietCapstoneContext _context;
 
-        public IndexModel(ILogger<IndexModel> logger, HttpClient client, IConfiguration configuration, SmartDietCapstoneContext _context)
+        public IndexModel(ILogger<IndexModel> logger, HttpClient client, IConfiguration configuration, SmartDietCapstoneContext context)
         {
             _logger = logger;
             _client = client;
             _configuration = configuration;
-            
+            _context = context;
             
         }
 
@@ -66,9 +67,12 @@ namespace SmartDietCapstone.Pages
             }
             else
             {
+
+                
                 FoodCalculator foodCalculator = new FoodCalculator(genderSelect, age, weight, height, goalSelect, activitySelect, isKeto, carbNumSelect, caller);
 
                 var diet = await foodCalculator.GenerateDiet(mealNumSelect);
+               
                 var jsonDiet = JsonConvert.SerializeObject(diet);
                 var jsonCalculator = JsonConvert.SerializeObject(foodCalculator);
                 HttpContext.Session.SetString("diet", jsonDiet);

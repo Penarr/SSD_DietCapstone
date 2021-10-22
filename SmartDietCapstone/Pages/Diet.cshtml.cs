@@ -21,6 +21,7 @@ namespace SmartDietCapstone.Pages
         public List<Meal> _diet;
         public FoodCalculator foodCalculator;
         public double dietCalories;
+        string jsonDiet;
         public DietModel() { }
 
         /// <summary>
@@ -63,7 +64,19 @@ namespace SmartDietCapstone.Pages
         }
 
 
+        public IActionResult OnPostSaveDiet()
+        {
+            SetDietAndCalculator();
+            if(_diet.Count > 0)
+            {
+                HttpContext.Session.SetString("favouriteDiet", HttpContext.Session.GetString("diet"));
+               // Request.QueryString.Add("previousUrl", Request.Path.ToString()); 
+                return new RedirectToPageResult("/Account/Manage/Index", "SaveDiet", new  { area = "Identity" });
+            }
 
+            return new PageResult();
+
+        }
         /// <summary>
         /// 
         /// </summary>

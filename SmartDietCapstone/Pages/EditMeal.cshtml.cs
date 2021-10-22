@@ -13,7 +13,7 @@ using SmartDietCapstone.Models;
 
 namespace SmartDietCapstone.Pages
 {
-    [Authorize(Roles="User")]
+    [Authorize]
     public class EditMealModel : PageModel
     {
         private APICaller caller;

@@ -67,7 +67,7 @@ namespace SSD_Lab1.Data
             // Create Manager User
             var admin = new SmartDietCapstoneUser
             {
-                UserName = "penarr",
+                UserName = "penarr@dietcapstone.ca",
                 Email = "penarr@dietcapstone.ca",
                 //FirstName = "Rob",
                 //LastName = "Peña",
@@ -75,7 +75,7 @@ namespace SSD_Lab1.Data
                 //BirthDate = DateTime.Today,
                 EmailConfirmed = true
             };
-            var result = await userManager.CreateAsync(admin, "Pa55word!");
+            var result = await userManager.CreateAsync(admin, "T@t5u_M4k1");
             if (!result.Succeeded)
                 return 1;  // should log an error message here
 

@@ -16,7 +16,7 @@ namespace SmartDietCapstone
 {
     public class Startup
     {
-        
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -40,7 +40,7 @@ namespace SmartDietCapstone
                 options.Cookie.IsEssential = true;
             });
 
-     
+
             services.AddDatabaseDeveloperPageExceptionFilter();
         }
 
@@ -58,13 +58,16 @@ namespace SmartDietCapstone
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+           
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
+
 
             app.UseSession();
             app.UseEndpoints(endpoints =>
@@ -72,7 +75,7 @@ namespace SmartDietCapstone
                 endpoints.MapRazorPages();
             });
 
-            
+
         }
     }
 }

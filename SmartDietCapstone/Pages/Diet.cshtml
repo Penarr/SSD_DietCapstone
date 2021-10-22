@@ -74,8 +74,8 @@
         }
 
         <form method="post" asp-page-handler="SaveDiet">
+            <input type="hidden" value="@Json." name="jsonDiet"/>
             <button type="submit" class="btn btn-primary" value="Submit">Save Diet</button>
-
         </form>
 
     }
