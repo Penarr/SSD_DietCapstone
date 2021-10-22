@@ -21,6 +21,7 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
         private readonly SignInManager<SmartDietCapstoneUser> _signInManager;
         private readonly IConfiguration _configuration;
         public List<List<Meal>> favouriteDiets;
+        public List<double> dietCalories;
         public IndexModel(
             UserManager<SmartDietCapstoneUser> userManager,
             SignInManager<SmartDietCapstoneUser> signInManager,
@@ -30,6 +31,7 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
             _configuration = configuration;
             favouriteDiets = new List<List<Meal>>();
+            dietCalories = new List<double>();
         }
 
         public string Username { get; set; }
@@ -146,9 +148,9 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
         }
 
         /// <summary>
-        /// 
+        /// Change
         /// </summary>
-        /// <param name="dietIndex"></param>
+        /// <param name="dietIndex">Index of favourite diet to edit</param>
         /// <returns></returns>
         public IActionResult EditFavouriteDiet(int dietIndex)
         {
@@ -156,6 +158,7 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
             {
                 string jsonDiet = JsonConvert.SerializeObject(favouriteDiets[dietIndex]);
                 HttpContext.Session.SetString("diet", jsonDiet);
+                return new RedirectToPageResult("Diet");
 
             }
             return new PageResult();
@@ -186,7 +189,12 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
                     {
                         foreach(List<Meal> diet in favouriteDiets)
                         {
-
+                            double totalCaloriesOfDiet= 0;
+                            foreach(Meal meal in diet)
+                            {
+                                totalCaloriesOfDiet += meal.totalCals;
+                            }
+                            dietCalories.Add(totalCaloriesOfDiet);
                         }
                     }
                 }

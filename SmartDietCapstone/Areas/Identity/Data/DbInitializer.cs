@@ -23,23 +23,23 @@ namespace SSD_Lab1.Data
 
             var userManager = serviceProvider.GetRequiredService<UserManager<SmartDietCapstoneUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            
+
 
             // Check if roles already exist and exit if there are
-            //if (roleManager.Roles.Count() > 0)
-            //    return 1;  // should log an error message here
+            if (roleManager.Roles.Count() > 0)
+                return 1;  // should log an error message here
 
             // Seed roles
-            //int result = await SeedRoles(roleManager);
-            //if (result != 0)
-            //    return 2;  // should log an error message here
+            int result = await SeedRoles(roleManager);
+            if (result != 0)
+                return 2;  // should log an error message here
 
             // Check if users already exist and exit if there are
-            //if (userManager.Users.Count() > 0)
-            //    return 3;  // should log an error message here
+            if (userManager.Users.Count() > 0)
+                return 3;  // should log an error message here
 
             // Seed users
-           var result = await SeedUsers(userManager);
+            result = await SeedUsers(userManager);
             if (result != 0)
                 return 4;  // should log an error message here
 
