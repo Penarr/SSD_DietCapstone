@@ -8,6 +8,7 @@ namespace SSD_Lab1.Models
     public class AppSecrets
     {
         public string AdminPwd { get; set; }
+        public string UserPwd { get; set; }
         
     }
 }

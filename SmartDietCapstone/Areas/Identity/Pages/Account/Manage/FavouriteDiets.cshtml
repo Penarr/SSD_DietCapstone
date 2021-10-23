@@ -34,10 +34,10 @@
                 @for (int i = 0; i < Model.favouriteDiets.Count; i++)
                 {
                     <tr>
-                        <td>@Model.dietCalories[i]</td>
-                        <td>@Model.dietProtein[i]</td>
-                        <td>@Model.dietCarbs[i]</td>
-                        <td>@Model.dietFat[i]</td>
+                        <td>@Model.dietCalories[i] calories</td>
+                        <td>@Model.dietProtein[i] grams</td>
+                        <td>@Model.dietCarbs[i] grams</td>
+                        <td>@Model.dietFat[i] grams</td>
                         <td>
                             <form method="post" asp-page-handler="DeleteDiet">
                                 <input type="hidden" value="@Model.dietIds[i]" name="dietId" />

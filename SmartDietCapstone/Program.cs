@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SSD_Lab1.Data;
+using SSD_Lab1.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,14 @@ namespace SmartDietCapstone
         public static void Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();//.Run();
+            var configuration = host.Services.GetService<IConfiguration>();
+            var hosting = host.Services.GetService<IWebHostEnvironment>();
+
+            if (hosting.IsDevelopment())
+            {
+                var secrets = configuration.GetSection("Passwords").Get<AppSecrets>();
+                DbInitializer.appSecrets = secrets;
+            }
 
             using (var scope = host.Services.CreateScope())
                 DbInitializer.SeedUsersAndRoles(scope.ServiceProvider).Wait();

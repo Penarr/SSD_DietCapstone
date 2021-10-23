@@ -14,7 +14,9 @@ namespace SSD_Lab1.Data
 {
     public static class DbInitializer
     {
-       // public static AppSecrets appSecrets { get; set; }
+        internal static AppSecrets appSecrets;
+
+        
         public static async Task<int> SeedUsersAndRoles(IServiceProvider serviceProvider)
         {
             // create the database if it doesn't exist
@@ -69,13 +71,10 @@ namespace SSD_Lab1.Data
             {
                 UserName = "penarr@dietcapstone.ca",
                 Email = "penarr@dietcapstone.ca",
-                //FirstName = "Rob",
-                //LastName = "Peña",
-                //PhoneNumber = "123456789",
-                //BirthDate = DateTime.Today,
+                
                 EmailConfirmed = true
             };
-            var result = await userManager.CreateAsync(admin, "T@t5u_M4k1");
+            var result = await userManager.CreateAsync(admin, appSecrets.AdminPwd);
             if (!result.Succeeded)
                 return 1;  // should log an error message here
 
@@ -84,24 +83,23 @@ namespace SSD_Lab1.Data
             if (!result.Succeeded)
                 return 2;  // should log an error message here
 
-            // Create Player User
-            //var playerUser = new SmartDietCapstoneUser
-            //{
-            //    UserName = "the.member@mohawkcollege.ca",
-            //    Email = "the.member@mohawkcollege.ca",
-            //    FirstName = "The",
-            //    LastName = "Player",
-            //    PhoneNumber = "123456789",
-            //    EmailConfirmed = true
-            //};
-            //result = await userManager.CreateAsync(playerUser, appSecrets.UserPwd);
-            //if (!result.Succeeded)
-            //    return 3;  // should log an error message here
+           // Create Player User
+           var user = new SmartDietCapstoneUser
+           {
+               UserName = "the.member@mohawkcollege.ca",
+               Email = "the.member@mohawkcollege.ca",
+              
+               
+               EmailConfirmed = true
+           };
+            result = await userManager.CreateAsync(user, appSecrets.UserPwd);
+            if (!result.Succeeded)
+                return 3;  // should log an error message here
 
-            //// Assign user to Member role
-            //result = await userManager.AddToRoleAsync(playerUser, "Player");
-            //if (!result.Succeeded)
-            //    return 4;  // should log an error message here
+            // Assign user to Member role
+            result = await userManager.AddToRoleAsync(user, "User");
+            if (!result.Succeeded)
+                return 4;  // should log an error message here
 
             return 0;
         }

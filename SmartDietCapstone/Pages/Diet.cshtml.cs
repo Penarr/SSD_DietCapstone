@@ -34,7 +34,7 @@ namespace SmartDietCapstone.Pages
         }
 
         /// <summary>
-        /// 
+        /// Constructs diet based on diet for get
         /// </summary>
 
         public async Task OnGet()
@@ -54,7 +54,9 @@ namespace SmartDietCapstone.Pages
 
         }
         /// <summary>
-        /// 
+        /// Sets diet and calculator from cookies.
+        /// If calculator cookie is set and user is logged in, will set user's new macro
+        /// recommendations to the new amount
         /// </summary>
         private async Task SetDietAndCalculator()
         {
@@ -87,7 +89,8 @@ namespace SmartDietCapstone.Pages
            if (User.Identity.IsAuthenticated)
             {
                 var user = await _userManager.GetUserAsync(User);
-                recommendedCalories = user.UserCalories;
+                if(user.UserCalories > 0)
+                    recommendedCalories = user.UserCalories;
             }
                
 
@@ -135,10 +138,10 @@ namespace SmartDietCapstone.Pages
             return new PageResult();
         }
         /// <summary>
-        /// 
+        /// Updates the diet cookie for any meal deleted
         /// </summary>
-        /// <param name="dietIndex"></param>
-        /// <returns></returns>
+        /// <param name="dietIndex">Index of meal to be deleted</param>
+        /// <returns>Diet page with updated diet</returns>
         public async Task<IActionResult> OnPostDeleteMeal(int deleteIndex)
         {
             await SetDietAndCalculator();
@@ -156,7 +159,7 @@ namespace SmartDietCapstone.Pages
         }
 
         /// <summary>
-        /// 
+        /// Makes changes to meal being edited, and adds them to the diet
         /// </summary>
         public async Task OnGetEditDiet()
         {
