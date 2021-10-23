@@ -214,26 +214,26 @@ else
                 $("searchBody").html(""); // CLEARS TABLE OF CURRENT RESULTS
                 for (i = 0; i < data.length; i++) {
                     food = data[i];
-                    var addFoodButton = $("<button>", { "class": "btn btn-success add-food-button", "type": "button", "text": "Add Food" }).click(function () {
+                    var addFoodButton = $("<button>", { "class": "btn btn-success add-food-button", "type": "button", "text": "Add Food", "data-toggle": "modal", "data-target": "#foodModal" }).click(function () {
 
                         foods.push(food);
                         repopulateCurrentMeal();
                     }); // BUTTON THAT WILL ADD FOOD RESULT TO DIET WHEN CLICKED.
-                   
-                     var foodRow = $("<tr> <td>" + food.name + "</td> <td>" + food.cals + "</td> <td>" +
-                         food.protein + "</td> <td>" + food.carbs + "</td> <td>" + food.fat + "</td><td></td></tr>");
+
+                    var foodRow = $("<tr> <td>" + food.name + "</td> <td>" + food.cals + "</td> <td>" +
+                        food.protein + "</td> <td>" + food.carbs + "</td> <td>" + food.fat + "</td><td></td></tr>");
 
                     $("td:last", foodRow).append(addFoodButton); // ADDS BUTTON TO LAST CELL IN TABLE ROW
                     $("#searchBody").append(foodRow); //APPENDS ROW TO SEARCH BODY
                 }
 
-            }).fail(function (error) { console.log(error); });
+            });
 
         });
 
         // Prepares html table that allows user to edit food items
             $(".editFoodButton").click(function () {
-
+              
                 currentIndex = $(this).val();
                 var food = foods[currentIndex];
 
@@ -241,7 +241,7 @@ else
                 proteinPerGram = food.protein / food.servingSize;
                 carbsPerGram = food.carbs / food.servingSize;
                 fatPerGram = food.fat / food.servingSize;
-           
+
                 $("#foodNameCell").html(food.name);
                 $("#servingSizeInput").val(food.servingSize);
                 $("#calsInput").val(food.cals);
@@ -251,7 +251,18 @@ else
 
                 $("#servingSizeInput").change(changeFoodMacros);
 
-        });
+            });
+
+
+                // Delete food from meal, then repopulates table
+                $(".deleteFoodButton").click(function () {
+                  
+                    deleteIndex = $(this).val();
+                    if (deleteIndex > -1)
+                        foods.splice(deleteIndex, 1);
+
+                    repopulateCurrentMeal();
+                });
             // Calculates macros based on serving size. Rounds to 2 decimals
             function changeFoodMacros() {
 
@@ -277,32 +288,59 @@ else
             });
 
 
-        // Delete food from meal, then repopulates table
-        $(".deleteFoodButton").click(function () {
-            deleteIndex = $(this).val();
-            if (deleteIndex > -1)
-                foods.splice(deleteIndex, 1);
 
-            repopulateCurrentMeal();
-        });
 
 
             //  Repopulates meal table with foods array
-            function repopulateCurrentMeal() {
-                let replacedHtml = "";
-                console.log(foods);
+                function repopulateCurrentMeal() {
+                    $("#currentMealBody").html("");
+
                 for (i = 0; i < foods.length; i++) {
-                    replacedHtml += "<tr> <td>" +  foods[i].name +"</td>" +
+                    mealRow = $("<tr> <td>" +  foods[i].name +"</td>" +
                     "<td>"+  foods[i].servingSize + " grams </td>" +
                      "<td>"+  foods[i].cals + " grams </td>" +
                      "<td>"+  foods[i].protein + " grams </td>" +
                         "<td>"+  foods[i].carbs + " grams </td>" +
                         "<td>"+  foods[i].fat + " grams </td>" +
-                        "<td><button type='button' class='btn btn-info editFoodButton' data-target='#foodModal' value='"+  i + "'>Edit</button></td>" +
-                    "<td><button type='button' class='btn btn-danger deleteFoodButton' value='"+  i + "'>Delete</button></td>  </tr>";
+                        "<td></td><td></td></tr>");
 
+                    var editFoodButton = $("<button>", { "class": "btn btn-info editFoodButton", "type": "button", "text": "Edit", "value": i}).click(function () {
+
+                        currentIndex = $(this).val();
+                        console.log(currentIndex);
+                        var food = foods[currentIndex];
+
+                        calsPerGram = food.cals / food.servingSize;
+                        proteinPerGram = food.protein / food.servingSize;
+                        carbsPerGram = food.carbs / food.servingSize;
+                        fatPerGram = food.fat / food.servingSize;
+
+                        $("#foodNameCell").html(food.name);
+                        $("#servingSizeInput").val(food.servingSize);
+                        $("#calsInput").val(food.cals);
+                        $("#proteinInput").val(food.protein);
+                        $("#carbsInput").val(food.carbs);
+                        $("#fatInput").val(food.fat);
+
+                        $("#servingSizeInput").change(changeFoodMacros);
+                    }); // BUTTON THAT WILL EDIT FOOD SELECTION TO DIET WHEN CLICKED.
+
+                    var deleteFoodButton = $("<button>", { "class": "btn btn-danger deleteFoodButton", "type": "button", "text": "Delete", "value": i }).click(function () {
+
+                        deleteIndex = $(this).val();
+                        if (deleteIndex > -1)
+                            foods.splice(deleteIndex, 1);
+
+                        repopulateCurrentMeal();
+                    }); // BUTTON THAT WILL DELETE FOOD SELECTION TO DIET WHEN CLICKED.
+
+
+                    $(mealRow.children()[mealRow.children().length - 2]).append(editFoodButton);
+                    /*$("td:last".prev(), mealRow).append(editFoodButton);*/ // EDIT BUTTON TO SECOND LAST CELL IN TABLE ROW
+                    $("td:last",mealRow).append(deleteFoodButton); // DELETE BUTTON TO LAST CELL IN TABLE ROW
+                    $("#currentMealBody").append(mealRow); //APPENDS ROW TO SEARCH BODY
                 }
-                $("#currentMealBody").html(replacedHtml);
+                
 
                 calculateCurrentTotals();
             }
@@ -329,8 +367,10 @@ else
                     $("#jsonFoods").val(JSON.stringify(foods));
                 }
             });
-        });
 
+
+
+        });
 
         </script>
     }

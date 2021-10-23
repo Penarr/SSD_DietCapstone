@@ -34,14 +34,12 @@ namespace SmartDietCapstone.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly HttpClient _client;
         private IConfiguration _configuration;
-        private SmartDietCapstoneContext _context;
 
-        public IndexModel(ILogger<IndexModel> logger, HttpClient client, IConfiguration configuration, SmartDietCapstoneContext context)
+        public IndexModel(ILogger<IndexModel> logger, HttpClient client, IConfiguration configuration)
         {
             _logger = logger;
             _client = client;
             _configuration = configuration;
-            _context = context;
             
         }
 
@@ -54,9 +52,6 @@ namespace SmartDietCapstone.Pages
             string apiUrl = _configuration["Secrets:FDCApi"];
             double height = inchSelect + feetSelect * 12;
             APICaller caller = new APICaller(apiUrl, apiKey, _client);
-
-
-
 
             if (!ModelState.IsValid)
             {
