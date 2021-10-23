@@ -6,7 +6,7 @@
 <div class="text-center">
 
     <h1>Diet</h1>
-    @if (Model._diet == null && Model.foodCalculator == null)
+    @if (Model._diet == null || Model.recommendedCalories != null)
     {
 
 
@@ -21,7 +21,7 @@
                 <p>
                     <strong>Recommended Daily Caloric Intake:</strong>
 
-                    @Model.foodCalculator.calorieCount calories
+                    @Model.recommendedCalories calories
                 </p>
             </div>
 

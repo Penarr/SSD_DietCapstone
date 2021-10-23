@@ -22,6 +22,9 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
         private readonly IConfiguration _configuration;
         public List<List<Meal>> favouriteDiets;
         public List<double> dietCalories;
+        public List<double> dietProtein;
+        public List<double> dietCarbs;
+        public List<double> dietFat;
         public IndexModel(
             UserManager<SmartDietCapstoneUser> userManager,
             SignInManager<SmartDietCapstoneUser> signInManager,
@@ -32,6 +35,9 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
             _configuration = configuration;
             favouriteDiets = new List<List<Meal>>();
             dietCalories = new List<double>();
+            dietProtein = new List<double>();
+            dietCarbs = new List<double>();
+            dietFat = new List<double>();
         }
 
         public string Username { get; set; }
@@ -70,10 +76,7 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
             
-            if (HttpContext.Session.Keys.Contains("favouriteDiet"))
-                await SaveFavouriteDiet();
-
-            GetFavouriteDiets();
+            
             await LoadAsync(user);
             return Page();
         }
@@ -103,105 +106,14 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            if (HttpContext.Session.Keys.Contains("favouriteDiet"))
-               await SaveFavouriteDiet();
-            GetFavouriteDiets();
+            
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public async Task SaveFavouriteDiet()
-        {
-            if (HttpContext.Session.Keys.Contains("favouriteDiet"))
-            {
-                string jsonDiet = HttpContext.Session.GetString("favouriteDiet");
-
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-                var user = await _userManager.GetUserAsync(User);
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    string updateQuery = "INSERT INTO Diet (UserId, SerializedDiet) VALUES(@id, @diet);";
-                    SqlCommand command = new SqlCommand(updateQuery, conn);
-
-                    command.Parameters.AddWithValue("@id", user.Id);
-                    command.Parameters.AddWithValue("@diet", jsonDiet);
-
-                    try
-                    {
-                        await conn.OpenAsync();
-                        var result = await command.ExecuteNonQueryAsync();
-                        conn.Close();
-                    }
-
-                    
-                    catch (Exception e) 
-                    { var message = e.Message; }
-                }
-                HttpContext.Session.Remove("favouriteDiet");
-            }
-
-            
-        }
-
-        /// <summary>
-        /// Change
-        /// </summary>
-        /// <param name="dietIndex">Index of favourite diet to edit</param>
-        /// <returns></returns>
-        public IActionResult EditFavouriteDiet(int dietIndex)
-        {
-            if (dietIndex < favouriteDiets.Count)
-            {
-                string jsonDiet = JsonConvert.SerializeObject(favouriteDiets[dietIndex]);
-                HttpContext.Session.SetString("diet", jsonDiet);
-                return new RedirectToPageResult("Diet");
-
-            }
-            return new PageResult();
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        public async void GetFavouriteDiets()
-        {
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                string query = "SELECT SerializedDiet from Diet where UserId = @id;";
-                SqlCommand command = new SqlCommand(query, conn);
-                var user = await _userManager.GetUserAsync(User);
-                command.Parameters.AddWithValue("@id", user.Id);
-
-                try
-                {
-                    await conn.OpenAsync();
-                    SqlDataReader reader = await command.ExecuteReaderAsync();
-                    while (reader.Read())
-                    {
-                        favouriteDiets.Add(JsonConvert.DeserializeObject<List<Meal>>(reader.GetString(0)));
-                    }
-
-                    if(favouriteDiets != null)
-                    {
-                        foreach(List<Meal> diet in favouriteDiets)
-                        {
-                            double totalCaloriesOfDiet= 0;
-                            foreach(Meal meal in diet)
-                            {
-                                totalCaloriesOfDiet += meal.totalCals;
-                            }
-                            dietCalories.Add(totalCaloriesOfDiet);
-                        }
-                    }
-                }
-                catch (Exception e) { }
+       
 
 
-            }
-        }
     }
 }

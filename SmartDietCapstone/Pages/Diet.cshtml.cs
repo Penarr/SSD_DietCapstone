@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Session;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 
+using SmartDietCapstone.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
+
 namespace SmartDietCapstone.Pages
 {
 
@@ -21,18 +24,24 @@ namespace SmartDietCapstone.Pages
         public List<Meal> _diet;
         public FoodCalculator foodCalculator;
         public double dietCalories;
-        string jsonDiet;
-        public DietModel() { }
+        public double recommendedCalories;
+        private readonly UserManager<SmartDietCapstoneUser> _userManager;
+        
+        public DietModel(UserManager<SmartDietCapstoneUser> userManager)
+        {
+
+            _userManager = userManager;
+        }
 
         /// <summary>
         /// 
         /// </summary>
 
-        public void OnGet()
+        public async Task OnGet()
         {
-            SetDietAndCalculator();
+            await SetDietAndCalculator();
             dietCalories = 0;
-            if(_diet != null)
+            if (_diet != null)
             {
                 foreach (Meal meal in _diet)
                 {
@@ -42,50 +51,76 @@ namespace SmartDietCapstone.Pages
                     }
                 }
             }
-            
+
         }
         /// <summary>
         /// 
         /// </summary>
-        private void SetDietAndCalculator()
+        private async Task SetDietAndCalculator()
         {
             var diet = "";
             var calculator = "";
 
             if (HttpContext.Session.Keys.Contains("diet"))
+            {
                 diet = HttpContext.Session.GetString("diet");
+                _diet = JsonConvert.DeserializeObject<List<Meal>>(diet);
+            }
 
 
-            if (HttpContext.Session.Keys.Contains("calculator"))
+
+            if (HttpContext.Session.Keys.Contains("calculator")) // Saves most recent recommendations to user table
+            {
                 calculator = HttpContext.Session.GetString("calculator");
+                foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(calculator);
+                if (User.Identity.IsAuthenticated)
+                {
+                    var user = await _userManager.GetUserAsync(User);
+                    user.UserCalories = foodCalculator.calorieCount;
+                    user.UserProtein = foodCalculator.proteinCount;
+                    user.UserCarbs = foodCalculator.carbCount;
+                    user.UserFat = foodCalculator.fatCount;
+                    await _userManager.UpdateAsync(user);
+                }
+                recommendedCalories = foodCalculator.calorieCount;
+            }
+           if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                recommendedCalories = user.UserCalories;
+            }
+               
 
-            _diet = JsonConvert.DeserializeObject<List<Meal>>(diet);
-            foodCalculator = JsonConvert.DeserializeObject<FoodCalculator>(calculator);
         }
 
 
-        public IActionResult OnPostSaveDiet()
+       
+        /// <summary>
+        /// Saves diet to database as favourite diet if user is logged in
+        /// </summary>
+        /// <returns>Favourite diets page</returns>
+        public async Task<IActionResult> OnPostSaveDiet()
         {
-            SetDietAndCalculator();
-            if(_diet.Count > 0)
+            await SetDietAndCalculator();
+            if (_diet.Count > 0)
             {
                 HttpContext.Session.SetString("favouriteDiet", HttpContext.Session.GetString("diet"));
-               // Request.QueryString.Add("previousUrl", Request.Path.ToString()); 
-                return new RedirectToPageResult("/Account/Manage/Index", "SaveDiet", new  { area = "Identity" });
+
+                return new RedirectToPageResult("/Account/Manage/FavouriteDiets", "SaveDiet", new { area = "Identity" });
             }
 
             return new PageResult();
 
         }
         /// <summary>
-        /// 
+        /// Opens the edit meal page to edit meal
         /// </summary>
-        /// <param name="mealIndex"></param>
-        /// <returns></returns>\
+        /// <param name="mealIndex">Index of the meal in the diet list</param>
+        /// <returns>Edit meal page result</returns>
 
-        public IActionResult OnPostGoToEditMeal(int mealIndex)
+        public async Task<IActionResult> OnPostGoToEditMeal(int mealIndex)
         {
-            SetDietAndCalculator();
+            await SetDietAndCalculator();
             if (_diet.Count > mealIndex)
             {
                 Meal meal = _diet[mealIndex];
@@ -104,9 +139,9 @@ namespace SmartDietCapstone.Pages
         /// </summary>
         /// <param name="dietIndex"></param>
         /// <returns></returns>
-        public IActionResult OnPostDeleteMeal(int deleteIndex)
+        public async Task<IActionResult> OnPostDeleteMeal(int deleteIndex)
         {
-            SetDietAndCalculator();
+            await SetDietAndCalculator();
             if (_diet.Count > deleteIndex)
             {
                 _diet.RemoveAt(deleteIndex);
@@ -123,9 +158,9 @@ namespace SmartDietCapstone.Pages
         /// <summary>
         /// 
         /// </summary>
-        public void OnGetEditDiet()
+        public async Task OnGetEditDiet()
         {
-            SetDietAndCalculator();
+            await SetDietAndCalculator();
 
             if (HttpContext.Session.Keys.Contains("mealIndex"))
             {
@@ -140,19 +175,5 @@ namespace SmartDietCapstone.Pages
             }
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

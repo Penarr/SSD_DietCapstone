@@ -1,0 +1,64 @@
+﻿@page
+@model SmartDietCapstone.Areas.Identity.Pages.Account.Manage.FavouriteDietsModel
+@{
+
+    <h1>Favourite Diets</h1>
+    if (Model.favouriteDiets.Count > 0)
+    {
+
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Calories
+                    </th>
+                    <th>
+                        Protein
+                    </th>
+                    <th>
+                        Carbs
+                    </th>
+                    <th>
+                        Fat
+                    </th>
+                    <th>
+
+                    </th>
+                    <th>
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.favouriteDiets.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.dietCalories[i]</td>
+                        <td>@Model.dietProtein[i]</td>
+                        <td>@Model.dietCarbs[i]</td>
+                        <td>@Model.dietFat[i]</td>
+                        <td>
+                            <form method="post" asp-page-handler="DeleteDiet">
+                                <input type="hidden" value="@Model.dietIds[i]" name="dietId" />
+                                <button type="submit" value="Submit" class="btn btn-danger"  >Delete</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" >
+                                <input type="hidden" value="@i" name="dietIndex" />
+                                <button type="submit" value="Submit" class="btn btn-info"asp-page-handler="ViewFavouriteDiet" >View Diet</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No favourite diets can be found.</p>
+    }
+
+}
