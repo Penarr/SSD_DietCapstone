@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Identity;
 
 namespace SmartDietCapstone
 {
@@ -47,6 +48,8 @@ namespace SmartDietCapstone
                     {
                         builder.AddUserSecrets<Program>();
                     }
+                    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+                    builder.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
                 });
 
 

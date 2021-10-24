@@ -40,7 +40,13 @@ namespace SmartDietCapstone.Pages
         public async Task OnGet()
         {
             await SetDietAndCalculator();
-            dietCalories = 0;
+
+            CalculateCalories();
+
+        }
+
+        public void CalculateCalories()
+        {
             if (_diet != null)
             {
                 foreach (Meal meal in _diet)
@@ -51,7 +57,6 @@ namespace SmartDietCapstone.Pages
                     }
                 }
             }
-
         }
         /// <summary>
         /// Sets diet and calculator from cookies.
@@ -173,7 +178,7 @@ namespace SmartDietCapstone.Pages
                     _diet[mealIndex] = JsonConvert.DeserializeObject<Meal>(TempData["meal"] as string);
                     HttpContext.Session.SetString("diet", JsonConvert.SerializeObject(_diet));
                 }
-
+                CalculateCalories();
 
             }
 

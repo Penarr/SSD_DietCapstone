@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/smartdietcapstonedbserver/databases/SmartDietCapstone_db",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:SmartDietCapstoneContextConnection",
+      "secretStore": "AzureKeyVault"
+    },
+    "secrets1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.KeyVault/vaults/SSDDietCapstonevault",
+      "type": "secrets.keyVault",
+      "connectionId": "VaultUri",
+      "secretStore": "AzureAppSettings"
+    }
+  }
+}
