@@ -48,8 +48,15 @@ namespace SmartDietCapstone
                     {
                         builder.AddUserSecrets<Program>();
                     }
-                    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
-                    builder.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+                    else
+                    {
+                        var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+                        builder.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+                    }
+                  
+                        
+                    
+                    
                 });
 
 
