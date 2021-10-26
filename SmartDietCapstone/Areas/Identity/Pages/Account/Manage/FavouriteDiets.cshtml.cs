@@ -64,7 +64,7 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
             {
                 string jsonDiet = HttpContext.Session.GetString("favouriteDiet");
 
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                string connectionString = _configuration.GetConnectionString("SmartDietCapstoneContextConnection");
                 var user = await _userManager.GetUserAsync(User);
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
