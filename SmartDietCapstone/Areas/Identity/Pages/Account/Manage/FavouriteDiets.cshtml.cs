@@ -93,7 +93,7 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
 
         public async Task DeleteFavouriteDiet(string dietId)
         {
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("SmartDietCapstoneContextConnection");
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = "DELETE from Diet where DietId = @id";
@@ -136,7 +136,7 @@ namespace SmartDietCapstone.Areas.Identity.Pages.Account.Manage
         /// </summary>
         public async Task GetFavouriteDiets()
         {
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("SmartDietCapstoneContextConnection");
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = "SELECT DietId, SerializedDiet from Diet where UserId = @id;";
