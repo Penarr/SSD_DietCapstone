@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -58,10 +60,10 @@ namespace SmartDietCapstone
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-           
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -74,6 +76,25 @@ namespace SmartDietCapstone
             });
 
 
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+               ctx.Context.Response.Headers.Add("X-Content-Type-Options", "nosniff")
+            });
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+                context.Response.Headers.Add("X-Xss-Protection", "1");
+                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                context.Response.Headers.Add("Cache-Control", "no-cache, no-store, must- revalidate");
+                await next();
+            });
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                HttpOnly =
+                   HttpOnlyPolicy.Always,
+                Secure = CookieSecurePolicy.Always
+            });
         }
     }
 }
